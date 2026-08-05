@@ -21,7 +21,14 @@ export const Login = () => {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Invalid email or password. Please try again.');
+      const detail = err.response?.data?.detail;
+      let errMsg = 'Invalid email or password. Please try again.';
+      if (typeof detail === 'string') {
+        errMsg = detail;
+      } else if (Array.isArray(detail)) {
+        errMsg = detail.map(d => d.msg).join(', ') || errMsg;
+      }
+      setError(errMsg);
     } finally {
       setLoading(false);
     }
