@@ -23,7 +23,14 @@ export const Register = () => {
       await register(email, password, fullName, role);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Registration failed. Please check your details.');
+      const detail = err.response?.data?.detail;
+      let errMsg = 'Registration failed. Please check your details.';
+      if (typeof detail === 'string') {
+        errMsg = detail;
+      } else if (Array.isArray(detail)) {
+        errMsg = detail.map(d => d.msg).join(', ') || errMsg;
+      }
+      setError(errMsg);
     } finally {
       setLoading(false);
     }
