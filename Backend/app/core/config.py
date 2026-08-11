@@ -15,3 +15,4 @@ class Settings(BaseSettings):
         case_sensitive = True
 
 settings = Settings()
+print("MONGODB_URL:", settings.MONGODB_URL)
