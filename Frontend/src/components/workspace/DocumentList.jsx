@@ -29,7 +29,7 @@ export const DocumentList = ({ documents = [], onDeleteSuccess }) => {
           {documents.map((doc) => (
             <div
               key={doc.id}
-              className="p-3 rounded-xl bg-terminal-dark/80 border border-terminal-border/80 flex items-center justify-between hover:border-slate-600 transition-colors"
+              className="p-3 rounded-xl glass-inset flex items-center justify-between hover:border-slate-600 transition-colors"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">

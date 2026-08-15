@@ -1,18 +1,20 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Layers, 
-  FileText, 
-  User, 
-  TrendingUp, 
-  Cpu, 
-  Database,
-  ExternalLink 
+import {
+  LayoutDashboard,
+  Layers,
+  FileText,
+  User,
+  TrendingUp,
+  Cpu,
+  Sparkles,
+  X,
 } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
 
-export const Sidebar = () => {
+export const Sidebar = ({ mobileOpen = false, onClose = () => {} }) => {
   const location = useLocation();
+  const { user } = useAuth();
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -22,74 +24,127 @@ export const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-64 border-r border-terminal-border bg-terminal-dark/95 flex flex-col justify-between h-screen sticky top-0">
-      {/* Top Brand Logo */}
-      <div>
-        <div className="h-16 flex items-center gap-3 px-6 border-b border-terminal-border/80">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-glow-emerald">
-            <TrendingUp className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="font-bold text-sm text-slate-100 tracking-wider">INFOSYS AI</h1>
-            <p className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest">Financial AI</p>
-          </div>
-        </div>
+    <>
+      {/* Mobile scrim */}
+      <div
+        onClick={onClose}
+        className={`fixed inset-0 z-40 bg-[#04070F]/70 backdrop-blur-sm lg:hidden transition-opacity duration-300 ${
+          mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+        aria-hidden="true"
+      />
 
-        {/* Navigation links */}
-        <nav className="p-4 space-y-1.5">
-          <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 mb-2">
-            Multi-Agent System
-          </p>
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location.pathname.startsWith(item.path);
+      <aside
+        className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-[268px] shrink-0 flex flex-col justify-between
+          border-r border-white/[0.07] bg-[#080D1B]/80 backdrop-blur-2xl
+          transition-transform duration-300 ease-premium
+          ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
+      >
+        {/* Ambient accent behind the glass rail */}
+        <div className="orb -top-24 -left-16 h-64 w-64 bg-brand-600/25" />
+        <div className="orb bottom-10 -left-20 h-56 w-56 bg-accent-600/20" />
 
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={`flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  isActive
-                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-glow-emerald'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-terminal-card'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-slate-500'}`} />
-                  <span>{item.name}</span>
-                </div>
-                {item.highlight && (
-                  <span className="text-[10px] font-mono font-semibold bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded">
-                    ⭐ CORE
-                  </span>
-                )}
-              </NavLink>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Bottom status widget */}
-      <div className="p-4 border-t border-terminal-border/80">
-        <div className="bg-terminal-card/80 border border-terminal-border rounded-xl p-3.5 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Cpu className="w-4 h-4 text-cyan-400" />
-              <span className="text-xs font-semibold text-slate-300">Agents Engine</span>
+        <div className="relative">
+          {/* Brand */}
+          <div className="h-16 flex items-center justify-between gap-3 px-5 border-b border-white/[0.06]">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-accent-600 flex items-center justify-center text-white shadow-[0_10px_25px_-12px_rgba(99,102,241,0.9)]">
+                <TrendingUp className="w-[18px] h-[18px]" />
+              </div>
+              <div>
+                <h1 className="font-bold text-sm text-slate-50 tracking-tight leading-none">Infosys AI</h1>
+                <p className="text-[10px] text-slate-500 uppercase tracking-[0.16em] mt-1">
+                  Financial Intelligence
+                </p>
+              </div>
             </div>
-            <span className="text-[10px] font-mono bg-cyan-500/20 text-cyan-400 px-1.5 py-0.5 rounded font-medium">
-              ACTIVE
-            </span>
+            <button
+              onClick={onClose}
+              className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+              aria-label="Close navigation"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
-          <p className="text-[11px] text-slate-400 leading-relaxed">
-            Document, Extraction, Red Flag & Comparison Agents coordinated.
-          </p>
-          <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 pt-1 border-t border-terminal-border/50">
-            <span>DB: MONGODB</span>
-            <span className="text-emerald-400">0 HALLUCINATION</span>
+
+          {/* Navigation */}
+          <nav className="p-4 space-y-1">
+            <p className="eyebrow px-3 mb-3">Multi-Agent System</p>
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname.startsWith(item.path);
+
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={onClose}
+                  className={`group relative flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 ease-premium ${
+                    isActive
+                      ? 'text-white bg-gradient-to-r from-brand-500/22 to-accent-500/10 border border-brand-400/25 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]'
+                      : 'text-slate-400 border border-transparent hover:text-slate-100 hover:bg-white/[0.05]'
+                  }`}
+                >
+                  {isActive && (
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-[3px] rounded-r-full bg-gradient-to-b from-brand-300 to-accent-400 shadow-[0_0_14px_2px_rgba(129,140,248,0.6)]" />
+                  )}
+                  <span className="flex items-center gap-3 min-w-0">
+                    <Icon
+                      className={`w-[17px] h-[17px] shrink-0 transition-colors ${
+                        isActive ? 'text-brand-300' : 'text-slate-500 group-hover:text-slate-300'
+                      }`}
+                    />
+                    <span className="truncate">{item.name}</span>
+                  </span>
+                  {item.highlight && (
+                    <span className="shrink-0 text-[9px] font-semibold uppercase tracking-wider bg-accent-500/15 text-accent-200 border border-accent-400/25 px-1.5 py-0.5 rounded-md">
+                      Core
+                    </span>
+                  )}
+                </NavLink>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Bottom: engine status + profile */}
+        <div className="relative p-4 space-y-3 border-t border-white/[0.06]">
+          <div className="glass rounded-xl p-3.5 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Cpu className="w-4 h-4 text-accent-300" />
+                <span className="text-xs font-semibold text-slate-200">Agents Engine</span>
+              </div>
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-brand-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse" />
+                Active
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              Document, Extraction, Red Flag &amp; Comparison agents coordinated.
+            </p>
+            <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 pt-2 border-t glass-divider">
+              <span>DB: MONGODB</span>
+              <span className="text-brand-300">0 HALLUCINATION</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 px-1.5 py-1">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-500 to-accent-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
+              {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'A'}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-slate-100 truncate">
+                {user?.full_name || 'Analyst'}
+              </p>
+              <p className="text-[10px] text-slate-500 truncate flex items-center gap-1">
+                <Sparkles className="w-2.5 h-2.5 text-accent-300" />
+                {user?.role || 'Financial Analyst'}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };

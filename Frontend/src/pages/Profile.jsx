@@ -18,7 +18,7 @@ export const Profile = () => {
   return (
     <div className="space-y-6 max-w-4xl mx-auto animate-fadeIn">
       {/* Top Banner */}
-      <div className="pb-4 border-b border-terminal-border/80">
+      <div className="pb-4 border-b border-white/[0.07]">
         <h2 className="text-xl font-bold text-slate-100 tracking-tight flex items-center gap-2">
           <span>Analyst Profile & System Configuration</span>
           <Badge variant="emerald">ACTIVE USER SESSION</Badge>
@@ -32,8 +32,8 @@ export const Profile = () => {
         {/* User Card */}
         <Card title="User Account Details" subtitle="Authentication & Role Permissions">
           <div className="space-y-4 text-xs">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-terminal-dark/80 border border-terminal-border">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-slate-950 font-bold text-base">
+            <div className="flex items-center gap-3 p-3 rounded-xl glass-inset">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white font-bold text-base">
                 {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'A'}
               </div>
               <div>
@@ -60,7 +60,7 @@ export const Profile = () => {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-terminal-border flex justify-end">
+            <div className="pt-4 border-t border-white/10 flex justify-end">
               <Button variant="danger" size="sm" onClick={logout}>
                 Sign Out of Terminal
               </Button>
@@ -109,7 +109,7 @@ export const Profile = () => {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-terminal-border flex justify-end">
+            <div className="pt-4 border-t border-white/10 flex justify-end">
               <Button variant="secondary" size="sm" onClick={handleResetDemo}>
                 <RefreshCw className="w-4 h-4 mr-1.5" />
                 Reset Demo Session

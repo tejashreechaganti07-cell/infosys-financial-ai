@@ -84,9 +84,9 @@ export const ChatWindow = ({ workspaceId }) => {
   };
 
   return (
-    <div className="bg-terminal-card border border-terminal-border rounded-xl flex flex-col h-[600px] shadow-2xl">
+    <div className="glass rounded-2xl flex flex-col h-[600px] shadow-2xl">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-terminal-border/80 bg-terminal-dark/50">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.07] bg-white/[0.03]">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
             <Bot className="w-4 h-4" />
@@ -100,7 +100,7 @@ export const ChatWindow = ({ workspaceId }) => {
       </div>
 
       {/* Suggested queries bar */}
-      <div className="px-4 py-2 border-b border-terminal-border/50 bg-terminal-dark/30 flex items-center gap-2 overflow-x-auto text-xs">
+      <div className="px-4 py-2 border-b border-white/[0.06] bg-white/[0.02] flex items-center gap-2 overflow-x-auto text-xs">
         <span className="text-[10px] font-mono text-slate-400 shrink-0 flex items-center gap-1">
           <Sparkles className="w-3 h-3 text-emerald-400" /> SUGGESTED:
         </span>
@@ -108,7 +108,7 @@ export const ChatWindow = ({ workspaceId }) => {
           <button
             key={idx}
             onClick={() => handleSend(sq)}
-            className="px-2.5 py-1 rounded-full bg-terminal-hover/60 hover:bg-emerald-500/15 border border-terminal-border hover:border-emerald-500/30 text-slate-300 hover:text-emerald-300 transition-colors shrink-0 text-left"
+            className="px-2.5 py-1 rounded-full bg-white/[0.05] hover:bg-emerald-500/15 border border-white/10 hover:border-emerald-500/30 text-slate-300 hover:text-emerald-300 transition-colors shrink-0 text-left"
           >
             {sq}
           </button>
@@ -134,15 +134,16 @@ export const ChatWindow = ({ workspaceId }) => {
               )}
 
               <div
-                className={`max-w-xl rounded-2xl p-4 text-xs leading-relaxed ${
+                className={`max-w-xl rounded-2xl p-4 text-xs leading-relaxed animate-fadeUp ${
                   isUser
-                    ? 'bg-emerald-500 text-slate-950 font-medium rounded-tr-none shadow-glow-emerald'
-                    : 'bg-terminal-dark border border-terminal-border text-slate-200 rounded-tl-none'
+                    ? 'bg-gradient-to-br from-brand-500 to-accent-600 text-white font-medium rounded-tr-md border border-brand-300/30 shadow-[0_14px_34px_-18px_rgba(99,102,241,0.95),inset_0_1px_0_0_rgba(255,255,255,0.18)]'
+                    : 'glass-inset text-slate-200 rounded-tl-md'
                 }`}
               >
+
                 {/* Step-by-Step Reasoning Dropdown */}
                 {!isUser && hasReasoning && (
-                  <div className="mb-3 border-b border-terminal-border/80 pb-2.5">
+                  <div className="mb-3 border-b border-white/[0.07] pb-2.5">
                     <button
                       onClick={() => toggleReasoning(msg.id)}
                       className="flex items-center justify-between w-full text-left text-[11px] font-mono font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
@@ -171,7 +172,7 @@ export const ChatWindow = ({ workspaceId }) => {
 
                 {/* Citations Box */}
                 {!isUser && msg.citations && msg.citations.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-terminal-border/80 space-y-2">
+                  <div className="mt-3 pt-3 border-t border-white/[0.07] space-y-2">
                     <p className="text-[10px] font-mono font-semibold text-slate-400 uppercase flex items-center gap-1">
                       <Quote className="w-3 h-3 text-emerald-400" />
                       Strict Source Grounding Citations:
@@ -179,7 +180,7 @@ export const ChatWindow = ({ workspaceId }) => {
                     {msg.citations.map((cite, cIdx) => (
                       <div
                         key={cIdx}
-                        className="p-2 rounded bg-terminal-card/80 border border-emerald-500/20 text-[11px] space-y-1 font-mono"
+                        className="p-2 rounded bg-white/[0.05] border border-emerald-500/20 text-[11px] space-y-1 font-mono"
                       >
                         <div className="flex items-center justify-between text-emerald-400 font-semibold">
                           <span className="flex items-center gap-1">
@@ -213,7 +214,7 @@ export const ChatWindow = ({ workspaceId }) => {
             <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
               <Bot className="w-4 h-4 animate-pulse" />
             </div>
-            <div className="bg-terminal-dark border border-terminal-border rounded-2xl rounded-tl-none p-4 text-xs text-slate-400 flex items-center gap-2">
+            <div className="glass-inset rounded-2xl rounded-tl-none p-4 text-xs text-slate-400 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
               <span>Research Agent reasoning across vector DB embeddings...</span>
             </div>
@@ -228,21 +229,22 @@ export const ChatWindow = ({ workspaceId }) => {
           e.preventDefault();
           handleSend(input);
         }}
-        className="p-3.5 border-t border-terminal-border bg-terminal-dark/60 flex items-center gap-2"
+        className="p-3.5 border-t border-white/10 bg-[#070B16]/70 backdrop-blur-xl flex items-center gap-2.5"
       >
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask any multi-part financial research question..."
-          className="flex-1 bg-terminal-card border border-terminal-border text-slate-200 text-xs rounded-lg py-2.5 px-4 focus:outline-none focus:border-emerald-500 transition-colors"
+          className="field flex-1 h-11 px-4 text-xs"
           disabled={loading}
         />
         <button
           type="submit"
           disabled={!input.trim() || loading}
-          className="p-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold shadow-glow-emerald transition-all disabled:opacity-50"
+          className="h-11 w-11 shrink-0 grid place-items-center rounded-xl text-white bg-gradient-to-b from-brand-500 to-brand-600 border border-brand-400/40 shadow-[0_10px_26px_-14px_rgba(99,102,241,0.95),inset_0_1px_0_0_rgba(255,255,255,0.18)] transition-all duration-200 ease-premium hover:from-brand-400 hover:to-brand-500 active:translate-y-px disabled:opacity-40 disabled:pointer-events-none"
         >
+
           <Send className="w-4 h-4" />
         </button>
       </form>

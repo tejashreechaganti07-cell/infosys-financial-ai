@@ -9,8 +9,8 @@ export const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-terminal-dark flex items-center justify-center">
-        <Loader text="Verifying Analyst Session..." />
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader text="Verifying analyst session…" />
       </div>
     );
   }

@@ -67,7 +67,7 @@ export const UploadPanel = ({ workspaceId, onUploadSuccess }) => {
   };
 
   return (
-    <div className="bg-terminal-card border border-terminal-border rounded-xl p-5 shadow-lg">
+    <div className="glass rounded-2xl p-5 shadow-lg">
       <h3 className="font-semibold text-slate-100 text-sm mb-3 flex items-center gap-2">
         <Upload className="w-4 h-4 text-emerald-400" />
         <span>Ingest & Index Financial Document</span>
@@ -94,7 +94,7 @@ export const UploadPanel = ({ workspaceId, onUploadSuccess }) => {
           className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
             dragActive
               ? 'border-emerald-500 bg-emerald-500/10'
-              : 'border-terminal-border hover:border-slate-600 bg-terminal-dark/60'
+              : 'border-white/10 hover:border-slate-600 bg-[#070B16]/60'
           }`}
         >
           <input
@@ -143,7 +143,7 @@ export const UploadPanel = ({ workspaceId, onUploadSuccess }) => {
               type="text"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
-              className="w-full bg-terminal-dark border border-terminal-border text-slate-200 text-xs rounded-lg py-2 px-2.5 focus:outline-none focus:border-emerald-500"
+              className="w-full glass-inset text-slate-200 text-xs rounded-lg py-2 px-2.5 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15"
             />
           </div>
 
@@ -152,7 +152,7 @@ export const UploadPanel = ({ workspaceId, onUploadSuccess }) => {
             <select
               value={filingType}
               onChange={(e) => setFilingType(e.target.value)}
-              className="w-full bg-terminal-dark border border-terminal-border text-slate-200 text-xs rounded-lg py-2 px-2.5 focus:outline-none focus:border-emerald-500"
+              className="w-full glass-inset text-slate-200 text-xs rounded-lg py-2 px-2.5 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15"
             >
               <option value="Annual Report (20-F)">Annual Report (20-F)</option>
               <option value="Form 10-K">Form 10-K</option>
@@ -167,13 +167,13 @@ export const UploadPanel = ({ workspaceId, onUploadSuccess }) => {
               type="number"
               value={fiscalYear}
               onChange={(e) => setFiscalYear(Number(e.target.value))}
-              className="w-full bg-terminal-dark border border-terminal-border text-slate-200 text-xs rounded-lg py-2 px-2.5 focus:outline-none focus:border-emerald-500 font-mono"
+              className="w-full glass-inset text-slate-200 text-xs rounded-lg py-2 px-2.5 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15 font-mono"
             />
           </div>
         </div>
 
         {uploading && (
-          <div className="w-full bg-terminal-dark rounded-full h-2.5 overflow-hidden">
+          <div className="w-full bg-[#070B16] rounded-full h-2.5 overflow-hidden">
             <div
               className="bg-emerald-500 h-2.5 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}

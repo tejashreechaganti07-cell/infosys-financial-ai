@@ -51,7 +51,7 @@ export const RedFlagsPanel = () => {
           return (
             <div
               key={idx}
-              className="p-4 rounded-xl bg-terminal-dark/80 border border-terminal-border/80 hover:border-slate-600 transition-colors"
+              className="p-4 rounded-xl glass-inset hover:border-slate-600 transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -66,7 +66,7 @@ export const RedFlagsPanel = () => {
               <p className="text-xs text-slate-400 mt-2 leading-relaxed">
                 {item.description}
               </p>
-              <div className="mt-3 pt-2 border-t border-terminal-border/50 flex items-center justify-between text-[11px] font-mono text-slate-500">
+              <div className="mt-3 pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-500">
                 <span>Scan Engine: Red Flag Agent v1</span>
                 <span className="text-emerald-400">{item.citation}</span>
               </div>

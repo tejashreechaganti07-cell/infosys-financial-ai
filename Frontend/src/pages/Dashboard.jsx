@@ -36,46 +36,47 @@ export const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6">
       {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-terminal-border/80">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-5">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-slate-100 tracking-tight">
-              Executive Research Overview
-            </h2>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-              0 HALLUCINATION ENGINE
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h1 className="text-2xl font-bold text-slate-50 tracking-tight">
+              Executive research overview
+            </h1>
+            <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.08em] bg-brand-500/12 text-brand-200 border border-brand-400/25">
+              0 hallucination engine
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Infosys Internship Multi-Agent Financial Research System • Real Company Filings & Ratios
+          <p className="text-sm text-slate-400 mt-2 max-w-2xl">
+            Multi-agent financial research across real company filings, ratios and risk signals.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 shrink-0">
           <button
             onClick={fetchDashboard}
-            className="p-2 bg-terminal-card hover:bg-terminal-hover text-slate-300 hover:text-white rounded-lg border border-terminal-border transition-colors flex items-center gap-1.5 text-xs"
+            className="inline-flex items-center gap-2 h-10 px-3.5 rounded-xl text-xs font-semibold text-slate-300 bg-white/[0.05] border border-white/10 backdrop-blur-md hover:text-white hover:bg-white/[0.09] transition-all duration-200 ease-premium"
             title="Refresh Data"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
           </button>
           <Link
             to="/workspace"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs rounded-lg shadow-glow-emerald transition-all"
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-xl text-xs font-semibold text-white bg-gradient-to-b from-brand-500 to-brand-600 border border-brand-400/40 shadow-[0_10px_30px_-12px_rgba(99,102,241,0.9),inset_0_1px_0_0_rgba(255,255,255,0.18)] hover:from-brand-400 hover:to-brand-500 transition-all duration-200 ease-premium active:translate-y-px"
           >
             <Layers className="w-4 h-4" />
-            <span>Launch Research Workspace ⭐</span>
+            <span>Launch research workspace</span>
           </Link>
         </div>
       </div>
 
       {error && (
-        <div className="bg-rose-500/15 border border-rose-500/40 text-rose-300 px-4 py-3 rounded-xl text-xs">
+        <div className="glass rounded-2xl border-rose-500/30 bg-rose-500/[0.08] text-rose-200 px-4 py-3 text-xs">
           {error}
         </div>
+
       )}
 
       {/* KPI Stats Cards */}

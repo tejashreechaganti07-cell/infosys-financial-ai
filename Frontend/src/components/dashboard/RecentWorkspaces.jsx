@@ -25,7 +25,7 @@ export const RecentWorkspaces = ({ workspaces = [] }) => {
             <Link
               key={ws.id}
               to="/workspace"
-              className="p-4 rounded-xl bg-terminal-dark/60 border border-terminal-border/80 hover:border-emerald-500/40 hover:bg-terminal-hover/60 transition-all group flex flex-col justify-between"
+              className="p-4 rounded-xl glass-inset hover:border-emerald-500/40 hover:bg-white/[0.05] transition-all group flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between">
@@ -41,7 +41,7 @@ export const RecentWorkspaces = ({ workspaces = [] }) => {
                   {ws.description || "Multi-agent deep dive financial assessment."}
                 </p>
               </div>
-              <div className="mt-3 pt-3 border-t border-terminal-border/50 flex items-center justify-between text-[11px] font-mono text-slate-500">
+              <div className="mt-3 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-500">
                 <span>Updated: {ws.updated_at ? ws.updated_at.slice(0, 10) : 'Recent'}</span>
                 <span className="text-emerald-400 group-hover:translate-x-1 transition-transform flex items-center gap-1">
                   Launch <ArrowRight className="w-3 h-3" />

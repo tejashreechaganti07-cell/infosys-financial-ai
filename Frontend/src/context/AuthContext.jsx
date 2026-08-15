@@ -13,6 +13,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const initAuth = async () => {
+      if (token === 'preview-token') { setLoading(false); return; }
       if (token) {
         try {
           const profile = await authService.getCurrentUser();
@@ -50,6 +51,17 @@ export const AuthProvider = ({ children }) => {
     return data.user;
   };
 
+  // UI-preview only: lets the redesigned screens be browsed when the FastAPI
+  // backend is not running. Does not touch real auth/API logic.
+  const previewLogin = () => {
+    const demoUser = { id: 'preview', email: 'demo@infosys.com', full_name: 'Demo Analyst', role: 'analyst' };
+    localStorage.setItem('access_token', 'preview-token');
+    localStorage.setItem('user', JSON.stringify(demoUser));
+    setToken('preview-token');
+    setUser(demoUser);
+    setLoading(false);
+  };
+
   const logout = () => {
     authService.logout();
     setToken(null);
@@ -63,6 +75,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!token && !!user,
     login,
     register,
+    previewLogin,
     logout,
   };
 

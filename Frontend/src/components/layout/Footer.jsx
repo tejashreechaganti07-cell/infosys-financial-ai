@@ -2,13 +2,16 @@ import React from 'react';
 
 export const Footer = () => {
   return (
-    <footer className="h-10 border-t border-terminal-border bg-terminal-dark/95 flex items-center justify-between px-6 text-xs text-slate-500 font-mono">
-      <div>
-        <span>INFOSYS // MULTI-AGENT FINANCIAL RESEARCH SYSTEM (PHASE 1)</span>
-      </div>
-      <div className="flex items-center gap-4">
-        <span>STRICT SOURCE GROUNDING: ENABLED</span>
-        <span>LATENCY: 18ms</span>
+    <footer className="h-11 shrink-0 border-t border-white/[0.06] bg-[#070B16]/60 backdrop-blur-xl flex items-center justify-between gap-4 px-4 sm:px-6 text-[10px] sm:text-[11px] text-slate-500">
+      <span className="truncate tracking-wide">
+        Infosys · Multi-Agent Financial Research System
+      </span>
+      <div className="hidden sm:flex items-center gap-4 font-mono">
+        <span className="flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-brand-400" />
+          Strict source grounding
+        </span>
+        <span>Latency 18ms</span>
       </div>
     </footer>
   );

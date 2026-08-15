@@ -41,8 +41,8 @@ export const ComparisonPanel = () => {
             onClick={() => setSector('IT_SERVICES')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
               sector === 'IT_SERVICES'
-                ? 'bg-emerald-500 text-slate-950 shadow-glow-emerald'
-                : 'bg-terminal-dark border border-terminal-border text-slate-400 hover:text-white'
+                ? 'bg-emerald-500 text-white shadow-glow-emerald'
+                : 'glass-inset text-slate-400 hover:text-white'
             }`}
           >
             Indian IT Peers (INFY / TCS / WIPRO)
@@ -51,8 +51,8 @@ export const ComparisonPanel = () => {
             onClick={() => setSector('BIG_TECH')}
             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
               sector === 'BIG_TECH'
-                ? 'bg-emerald-500 text-slate-950 shadow-glow-emerald'
-                : 'bg-terminal-dark border border-terminal-border text-slate-400 hover:text-white'
+                ? 'bg-emerald-500 text-white shadow-glow-emerald'
+                : 'glass-inset text-slate-400 hover:text-white'
             }`}
           >
             US Big Tech Ratios
@@ -63,7 +63,7 @@ export const ComparisonPanel = () => {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-terminal-border/80 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+            <tr className="border-b border-white/[0.07] text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
               {activeData.headers.map((h, idx) => (
                 <th
                   key={idx}
@@ -76,9 +76,9 @@ export const ComparisonPanel = () => {
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-terminal-border/50 text-xs">
+          <tbody className="divide-y divide-white/[0.06] text-xs">
             {activeData.rows.map((row, rIdx) => (
-              <tr key={rIdx} className="hover:bg-terminal-hover/60 transition-colors">
+              <tr key={rIdx} className="hover:bg-white/[0.05] transition-colors">
                 <td className="py-3 px-4 font-semibold text-slate-200">{row.metric}</td>
                 <td className="py-3 px-4 font-mono font-bold text-emerald-400 bg-emerald-500/5 border-l border-r border-emerald-500/20">
                   {row.infy}
@@ -91,7 +91,7 @@ export const ComparisonPanel = () => {
           </tbody>
         </table>
       </div>
-      <div className="mt-4 pt-3 border-t border-terminal-border/60 flex items-center justify-between text-xs text-slate-400">
+      <div className="mt-4 pt-3 border-t border-white/[0.07] flex items-center justify-between text-xs text-slate-400">
         <span className="flex items-center gap-1.5">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>Extracted via Comparison Agent cross-filing matrix</span>
