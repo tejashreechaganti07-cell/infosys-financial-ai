@@ -1,7 +1,10 @@
 import asyncio
 import logging
 from typing import Optional
-from motor.motor_asyncio import AsyncIOMotorClient
+try:
+    from motor.motor_asyncio import AsyncIOMotorClient
+except Exception:
+    AsyncIOMotorClient = None
 from mongomock_motor import AsyncMongoMockClient
 from app.core.config import settings
 from app.core.security import hash_password
@@ -16,7 +19,7 @@ class DatabaseManager:
 
     @classmethod
     async def connect_db(cls):
-        if settings.MONGODB_URL:
+        if settings.MONGODB_URL and AsyncIOMotorClient is not None:
             try:
                 test_client = AsyncIOMotorClient(settings.MONGODB_URL, serverSelectionTimeoutMS=2000)
                 await test_client.admin.command('ping')
@@ -28,6 +31,10 @@ class DatabaseManager:
                 return
             except Exception as e:
                 logger.warning(f"Could not connect to live MongoDB: {e}. Falling back to in-memory MongoDB (AsyncMongoMockClient).")
+
+        else:
+            if settings.MONGODB_URL and AsyncIOMotorClient is None:
+                logger.warning("motor.motor_asyncio not available; using in-memory MongoDB (AsyncMongoMockClient).")
 
         cls.client = AsyncMongoMockClient()
         cls.db = cls.client[settings.DATABASE_NAME]
