@@ -23,7 +23,7 @@ export const RecentDocuments = ({ documents = [] }) => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-terminal-border/80 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+              <tr className="border-b border-white/[0.07] text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
                 <th className="py-2.5 px-3">Filing & Title</th>
                 <th className="py-2.5 px-3">Company</th>
                 <th className="py-2.5 px-3">Type</th>
@@ -31,9 +31,9 @@ export const RecentDocuments = ({ documents = [] }) => {
                 <th className="py-2.5 px-3">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-terminal-border/50 text-xs">
+            <tbody className="divide-y divide-white/[0.06] text-xs">
               {documents.map((doc) => (
-                <tr key={doc.id} className="hover:bg-terminal-hover/60 transition-colors">
+                <tr key={doc.id} className="hover:bg-white/[0.05] transition-colors">
                   <td className="py-3 px-3 font-medium text-slate-200 flex items-center gap-2">
                     <FileText className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span className="truncate max-w-xs" title={doc.title}>{doc.title}</span>

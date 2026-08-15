@@ -2,42 +2,417 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * ---------------------------------------------------------------
+ * PREMIUM GLASSMORPHISM DESIGN SYSTEM
+ * Deep navy canvas · indigo primary · violet secondary · glass depth
+ * ---------------------------------------------------------------
+ */
+
 @layer base {
+  :root {
+    --app-bg: #070b16;
+    --glass-bg: 255 255 255;
+    --glass-tint: rgba(255, 255, 255, 0.045);
+    --glass-tint-strong: rgba(255, 255, 255, 0.07);
+    --glass-border: rgba(148, 163, 184, 0.16);
+    --glass-border-strong: rgba(165, 180, 252, 0.28);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
-    @apply bg-[#0A0E17] text-slate-200 antialiased font-sans;
+    @apply text-slate-200 antialiased font-sans;
+    background-color: var(--app-bg);
+    /* Ambient depth: layered radial glows behind every glass surface */
+    background-image:
+      radial-gradient(900px 620px at 12% -8%, rgba(99, 102, 241, 0.20), transparent 60%),
+      radial-gradient(760px 520px at 92% 4%, rgba(139, 92, 246, 0.16), transparent 62%),
+      radial-gradient(1000px 700px at 50% 108%, rgba(56, 70, 160, 0.18), transparent 65%);
+    background-attachment: fixed;
+    letter-spacing: -0.005em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight text-slate-50;
+    text-wrap: balance;
+  }
+
+  p {
+    line-height: 1.65;
+  }
+
+  /* Elegant, unobtrusive focus ring across the whole app */
+  :focus-visible {
+    outline: 2px solid rgba(129, 140, 248, 0.75);
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+
+  ::selection {
+    background: rgba(99, 102, 241, 0.28);
+    color: #eef1ff;
   }
 
   /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
   ::-webkit-scrollbar-track {
-    background: #0B0F19;
+    background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #1F2937;
-    border-radius: 3px;
+    background: rgba(148, 163, 184, 0.22);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #374151;
+    background: rgba(165, 180, 252, 0.4);
+    background-clip: padding-box;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* ---------- GLASS SURFACES ---------- */
+  .glass {
+    background: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.075) 0%,
+      rgba(255, 255, 255, 0.03) 45%,
+      rgba(255, 255, 255, 0.018) 100%
+    );
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(18px) saturate(150%);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+      0 24px 50px -34px rgba(2, 6, 23, 0.95);
+  }
+
+  /* Slightly denser glass for surfaces holding a lot of text */
+  .glass-solid {
+    background: linear-gradient(160deg, rgba(20, 27, 46, 0.92) 0%, rgba(12, 17, 32, 0.9) 100%);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px) saturate(140%);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+      0 30px 60px -40px rgba(2, 6, 23, 0.95);
+  }
+
+  /* Recessed panel used inside glass cards */
+  .glass-inset {
+    background: rgba(7, 11, 22, 0.55);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    backdrop-filter: blur(8px);
+  }
+
+  .glass-card {
+    @apply glass rounded-2xl transition-all duration-300 ease-premium;
+  }
+
+  .glass-card-hover {
+    @apply glass-card;
+  }
+  .glass-card-hover:hover {
+    border-color: var(--glass-border-strong);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+      0 28px 60px -34px rgba(99, 102, 241, 0.55);
+    transform: translateY(-2px);
+  }
+
+  /* Hairline separator that reads well on glass */
+  .glass-divider {
+    border-color: rgba(148, 163, 184, 0.14);
+  }
+
+  /* ---------- FIELDS ---------- */
+  .field {
+    @apply w-full rounded-xl text-sm text-slate-100 transition-all duration-200 ease-premium;
+    background: rgba(7, 11, 22, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    backdrop-filter: blur(8px);
+  }
+  .field::placeholder {
+    @apply text-slate-500;
+  }
+  .field:hover:not(:disabled) {
+    border-color: rgba(165, 180, 252, 0.28);
+  }
+  .field:focus {
+    outline: none;
+    border-color: rgba(129, 140, 248, 0.85);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.14);
+    background: rgba(9, 14, 28, 0.78);
+  }
+  .field:disabled {
+    @apply opacity-55 cursor-not-allowed;
+  }
+  .field-error {
+    border-color: rgba(240, 82, 109, 0.7) !important;
+  }
+  .field-error:focus {
+    box-shadow: 0 0 0 4px rgba(240, 82, 109, 0.14) !important;
+  }
+
+  select.field {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    background-size: 1rem;
+    padding-right: 2.25rem;
+  }
+  select.field option {
+    background-color: #0e1426;
+    color: #e2e8f0;
+  }
+
+  /* ---------- LABELS / SECTION HEADINGS ---------- */
+  .label {
+    @apply block text-[11px] font-semibold uppercase tracking-[0.09em] text-slate-400 mb-1.5;
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500;
   }
 }
 
 @layer utilities {
-  .glass-card {
-    @apply bg-terminal-card/80 backdrop-blur-md border border-terminal-border/80 rounded-xl shadow-lg transition-all duration-200;
-  }
-  
-  .glass-card-hover {
-    @apply glass-card hover:border-emerald-500/40 hover:shadow-glow-emerald;
-  }
-  
   .text-gradient-emerald {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-200;
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(100deg, #c7cffe 0%, #8c99fa 45%, #a98bf9 100%);
   }
-  
+
   .text-gradient-cyan {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-indigo-300;
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(100deg, #a9b4fc 0%, #a98bf9 100%);
   }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  /* Reusable blurred ambient orb */
+  .orb {
+    @apply pointer-events-none absolute rounded-full blur-3xl;
+  }
+
+  .stagger > * {
+    animation: fadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .stagger > *:nth-child(1) { animation-delay: 0.02s; }
+  .stagger > *:nth-child(2) { animation-delay: 0.06s; }
+  .stagger > *:nth-child(3) { animation-delay: 0.1s; }
+  .stagger > *:nth-child(4) { animation-delay: 0.14s; }
+  .stagger > *:nth-child(5) { animation-delay: 0.18s; }
+  .stagger > *:nth-child(6) { animation-delay: 0.22s; }
 }
+
+/*
+ * ---------------------------------------------------------------
+ * LIGHT MODE — same premium glassmorphism language, inverted canvas
+ * Activated with <html data-theme="light">. Purely presentational.
+ * ---------------------------------------------------------------
+ */
+[data-theme="light"] {
+  --app-bg: #F4F6FC;
+  --glass-tint: rgba(255, 255, 255, 0.62);
+  --glass-tint-strong: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --glass-border-strong: rgba(99, 102, 241, 0.32);
+  color-scheme: light;
+}
+
+[data-theme="light"] body {
+  @apply text-slate-600;
+  background-color: var(--app-bg);
+  background-image:
+    radial-gradient(900px 620px at 12% -8%, rgba(99, 102, 241, 0.16), transparent 60%),
+    radial-gradient(760px 520px at 92% 4%, rgba(139, 92, 246, 0.14), transparent 62%),
+    radial-gradient(1000px 700px at 50% 108%, rgba(148, 163, 255, 0.18), transparent 65%);
+}
+
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4 {
+  @apply text-slate-900;
+}
+
+[data-theme="light"] ::selection {
+  background: rgba(99, 102, 241, 0.18);
+  color: #1e1b4b;
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.24);
+  background-clip: padding-box;
+}
+
+/* ---------- surfaces ---------- */
+[data-theme="light"] .glass {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0.68) 45%,
+    rgba(255, 255, 255, 0.58) 100%
+  );
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+    0 24px 50px -34px rgba(30, 41, 89, 0.35);
+}
+[data-theme="light"] .glass-solid {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.96) 0%, rgba(247, 249, 255, 0.94) 100%);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+    0 30px 60px -40px rgba(30, 41, 89, 0.4);
+}
+[data-theme="light"] .glass-inset {
+  background: rgba(241, 244, 253, 0.82);
+  border: 1px solid rgba(15, 23, 42, 0.07);
+}
+[data-theme="light"] .glass-card-hover:hover {
+  border-color: var(--glass-border-strong);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+    0 28px 60px -34px rgba(99, 102, 241, 0.45);
+}
+[data-theme="light"] .glass-divider {
+  border-color: rgba(15, 23, 42, 0.09);
+}
+
+/* ---------- fields ---------- */
+[data-theme="light"] .field {
+  @apply text-slate-800;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+}
+[data-theme="light"] .field::placeholder {
+  @apply text-slate-400;
+}
+[data-theme="light"] .field:focus {
+  border-color: rgba(99, 102, 241, 0.75);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+  background: #ffffff;
+}
+[data-theme="light"] select.field option {
+  background-color: #ffffff;
+  color: #1e293b;
+}
+[data-theme="light"] .field:-webkit-autofill,
+[data-theme="light"] .field:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1e293b;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+}
+[data-theme="light"] .label { @apply text-slate-500; }
+[data-theme="light"] .eyebrow { @apply text-slate-400; }
+
+/* ---------- utilities ---------- */
+[data-theme="light"] .bg-grid {
+  background-image:
+    linear-gradient(rgba(30, 41, 89, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 41, 89, 0.055) 1px, transparent 1px);
+}
+[data-theme="light"] .text-gradient-emerald {
+  background-image: linear-gradient(100deg, #4338CA 0%, #5145E5 45%, #7C3AED 100%);
+}
+[data-theme="light"] .text-gradient-cyan {
+  background-image: linear-gradient(100deg, #4F46E5 0%, #7C3AED 100%);
+}
+[data-theme="light"] .orb { opacity: 0.55; }
+
+/* ---------- text ramp remap (dark-tuned utilities -> light equivalents) ---------- */
+[data-theme="light"] .text-white,
+[data-theme="light"] .text-slate-50,
+[data-theme="light"] .text-slate-100 { color: #0F172A; }
+[data-theme="light"] .text-slate-200 { color: #1E293B; }
+[data-theme="light"] .text-slate-300 { color: #334155; }
+[data-theme="light"] .text-slate-400 { color: #475569; }
+[data-theme="light"] .text-slate-500 { color: #64748B; }
+[data-theme="light"] .hover\:text-white:hover,
+[data-theme="light"] .hover\:text-slate-100:hover,
+[data-theme="light"] .hover\:text-slate-200:hover { color: #0F172A; }
+
+/* Keep text on saturated brand fills readable (gradient buttons, avatars) */
+[data-theme="light"] .bg-gradient-to-r .text-white,
+[data-theme="light"] .bg-gradient-to-br .text-white,
+[data-theme="light"] [class*="from-brand-"].text-white,
+[data-theme="light"] [class*="from-brand-"] .text-white,
+[data-theme="light"] [class*="from-accent-"].text-white,
+[data-theme="light"] [class*="from-accent-"] .text-white,
+[data-theme="light"] [class*="bg-brand-5"].text-white,
+[data-theme="light"] [class*="bg-brand-6"].text-white { color: #FFFFFF; }
+
+/* ---------- translucent white fills / borders -> ink tints ---------- */
+[data-theme="light"] .bg-white\/\[0\.02\] { background-color: rgba(15, 23, 42, 0.02); }
+[data-theme="light"] .bg-white\/\[0\.03\] { background-color: rgba(15, 23, 42, 0.03); }
+[data-theme="light"] .bg-white\/\[0\.04\] { background-color: rgba(15, 23, 42, 0.035); }
+[data-theme="light"] .bg-white\/\[0\.05\] { background-color: rgba(15, 23, 42, 0.04); }
+[data-theme="light"] .bg-white\/\[0\.06\] { background-color: rgba(15, 23, 42, 0.05); }
+[data-theme="light"] .bg-white\/\[0\.07\] { background-color: rgba(15, 23, 42, 0.055); }
+[data-theme="light"] .bg-white\/\[0\.09\] { background-color: rgba(15, 23, 42, 0.07); }
+[data-theme="light"] .bg-white\/\[0\.1\],
+[data-theme="light"] .bg-white\/10 { background-color: rgba(15, 23, 42, 0.075); }
+[data-theme="light"] .hover\:bg-white\/\[0\.06\]:hover { background-color: rgba(15, 23, 42, 0.05); }
+[data-theme="light"] .hover\:bg-white\/\[0\.07\]:hover { background-color: rgba(15, 23, 42, 0.06); }
+[data-theme="light"] .hover\:bg-white\/\[0\.09\]:hover { background-color: rgba(15, 23, 42, 0.07); }
+[data-theme="light"] .hover\:bg-white\/10:hover { background-color: rgba(15, 23, 42, 0.08); }
+
+[data-theme="light"] .border-white\/\[0\.06\],
+[data-theme="light"] .border-white\/\[0\.07\],
+[data-theme="light"] .border-white\/10,
+[data-theme="light"] .border-white\/\[0\.08\] { border-color: rgba(15, 23, 42, 0.1); }
+[data-theme="light"] .hover\:border-white\/10:hover,
+[data-theme="light"] .hover\:border-white\/20:hover { border-color: rgba(15, 23, 42, 0.16); }
+[data-theme="light"] .divide-white\/\[0\.06\] > :not([hidden]) ~ :not([hidden]) { border-color: rgba(15, 23, 42, 0.08); }
+[data-theme="light"] .ring-white\/15 { --tw-ring-color: rgba(15, 23, 42, 0.12); }
+[data-theme="light"] .border-slate-600,
+[data-theme="light"] .border-slate-700 { border-color: rgba(15, 23, 42, 0.14); }
+[data-theme="light"] .bg-slate-800 { background-color: #E2E8F0; }
+[data-theme="light"] .bg-black\/75 { background-color: rgba(15, 23, 42, 0.42); }
+
+/* ---------- hard-coded navy chrome (navbar / sidebar / footer) ---------- */
+[data-theme="light"] .bg-\[\#070B16\],
+[data-theme="light"] .bg-\[\#0E1426\] { background-color: #FFFFFF; }
+[data-theme="light"] .bg-\[\#070B16\]\/70,
+[data-theme="light"] .bg-\[\#070B16\]\/60,
+[data-theme="light"] .bg-\[\#04070F\]\/70,
+[data-theme="light"] .bg-\[\#080D1B\]\/80 { background-color: rgba(255, 255, 255, 0.78); }
+[data-theme="light"] .from-\[\#04070F\] { --tw-gradient-from: rgba(255, 255, 255, 0.9) var(--tw-gradient-from-position); --tw-gradient-to: rgba(255, 255, 255, 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+
+/* Brand text tints need darker equivalents to stay legible on light glass */
+[data-theme="light"] .text-brand-200,
+[data-theme="light"] .text-brand-300,
+[data-theme="light"] .text-brand-400 { color: #4F46E5; }
+[data-theme="light"] .text-accent-200,
+[data-theme="light"] .text-accent-300,
+[data-theme="light"] .text-accent-400 { color: #7C3AED; }
+[data-theme="light"] .text-rose-300,
+[data-theme="light"] .text-rose-400 { color: #D93A57; }
+[data-theme="light"] .text-amber-300,
+[data-theme="light"] .text-amber-400 { color: #A46F13; }
+[data-theme="light"] .hover\:text-brand-200:hover,
+[data-theme="light"] .hover\:text-brand-300:hover { color: #4338CA; }
+[data-theme="light"] .group:hover .group-hover\:text-brand-300,
+[data-theme="light"] .group:focus-within .group-focus-within\:text-brand-300 { color: #4F46E5; }

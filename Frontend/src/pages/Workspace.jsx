@@ -81,23 +81,23 @@ export const Workspace = () => {
   ];
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6">
       {/* Workspace Selector Bar */}
-      <div className="bg-terminal-card border border-terminal-border rounded-xl p-4 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+      <div className="glass rounded-2xl p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+        <div className="flex items-start gap-4 min-w-0">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-500/10 border border-white/10 flex items-center justify-center text-brand-200 shrink-0">
             <Layers className="w-5 h-5" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-semibold text-slate-400 uppercase">ACTIVE WORKSPACE:</span>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="eyebrow">Active workspace</span>
               <select
                 value={activeWorkspace?.id || ''}
                 onChange={(e) => {
                   const ws = workspaces.find((w) => w.id === e.target.value);
                   if (ws) setActiveWorkspace(ws);
                 }}
-                className="bg-terminal-dark border border-terminal-border text-slate-100 text-sm font-semibold rounded-lg px-3 py-1 focus:outline-none focus:border-emerald-500"
+                className="field h-9 px-3 text-sm font-semibold w-auto max-w-full"
               >
                 {workspaces.map((ws) => (
                   <option key={ws.id} value={ws.id}>
@@ -106,25 +106,21 @@ export const Workspace = () => {
                 ))}
               </select>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
               {activeWorkspace?.description || 'Multi-agent deep dive analysis on company filings.'}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setShowCreateModal(true)}
-          >
-            <Plus className="w-4 h-4 mr-1" /> New Workspace
+        <div className="flex items-center gap-3 shrink-0">
+          <Button variant="secondary" size="md" onClick={() => setShowCreateModal(true)}>
+            <Plus className="w-4 h-4" /> New workspace
           </Button>
         </div>
       </div>
 
       {/* Tabs Bar */}
-      <div className="flex items-center gap-2 border-b border-terminal-border/80 pb-2 overflow-x-auto">
+      <div className="glass rounded-2xl p-1.5 flex items-center gap-1.5 overflow-x-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -133,17 +129,19 @@ export const Workspace = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+              aria-pressed={isActive}
+              className={`flex items-center gap-2 px-3.5 h-10 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 ease-premium shrink-0 ${
                 isActive
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-glow-emerald'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-terminal-card'
+                  ? 'text-white bg-gradient-to-r from-brand-500/28 to-accent-500/14 border border-brand-400/30 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]'
+                  : 'text-slate-400 border border-transparent hover:text-slate-100 hover:bg-white/[0.05]'
               }`}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className={`w-4 h-4 ${isActive ? 'text-brand-300' : ''}`} />
               <span>{tab.label}</span>
             </button>
           );
         })}
+
       </div>
 
       {/* Main Workspace Layout */}
@@ -195,7 +193,7 @@ export const Workspace = () => {
       {/* Create Workspace Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-          <div className="bg-terminal-card border border-terminal-border rounded-xl p-6 w-full max-w-md shadow-2xl space-y-4">
+          <div className="glass rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
             <h3 className="text-base font-bold text-slate-100">Create Research Workspace</h3>
             <div>
               <label className="block text-xs font-semibold text-slate-400 mb-1">Workspace Name</label>
@@ -204,7 +202,7 @@ export const Workspace = () => {
                 value={newWsName}
                 onChange={(e) => setNewWsName(e.target.value)}
                 placeholder="e.g. FY24 Q4 Competitor Analysis"
-                className="w-full bg-terminal-dark border border-terminal-border text-slate-200 text-xs rounded-lg py-2.5 px-3 focus:outline-none focus:border-emerald-500"
+                className="w-full glass-inset text-slate-200 text-xs rounded-lg py-2.5 px-3 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15"
               />
             </div>
             <div className="flex items-center justify-end gap-3 pt-2">

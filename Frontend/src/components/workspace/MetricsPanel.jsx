@@ -23,7 +23,7 @@ export const MetricsPanel = () => {
         {metrics.map((m, idx) => (
           <div
             key={idx}
-            className="p-3.5 rounded-xl bg-terminal-dark/80 border border-terminal-border/80 hover:border-emerald-500/40 transition-all flex flex-col justify-between"
+            className="p-3.5 rounded-xl glass-inset hover:border-emerald-500/40 transition-all flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between">
@@ -38,7 +38,7 @@ export const MetricsPanel = () => {
                 </span>
               </div>
             </div>
-            <div className="mt-3 pt-2 border-t border-terminal-border/50 flex items-center justify-between text-[10px] font-mono text-slate-500">
+            <div className="mt-3 pt-2 border-t border-white/[0.06] flex items-center justify-between text-[10px] font-mono text-slate-500">
               <span>FY23: {m.prev}</span>
               <span className="text-emerald-400/90">{m.citation}</span>
             </div>

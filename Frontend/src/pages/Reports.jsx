@@ -77,28 +77,25 @@ export const Reports = () => {
   }
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-terminal-border/80">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
         <div>
-          <h2 className="text-xl font-bold text-slate-100 tracking-tight flex items-center gap-2">
-            <span>Analyst Research Reports</span>
-            <Badge variant="emerald">AUTOMATED REPORT AGENT</Badge>
-          </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Structured investment summaries with Executive Summary, Financial Metrics, Red Flags, and Peer Ratios
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h1 className="text-2xl font-bold text-slate-50 tracking-tight">Analyst research reports</h1>
+            <Badge variant="cyan">Automated report agent</Badge>
+          </div>
+          <p className="text-sm text-slate-400 mt-2 max-w-2xl">
+            Structured investment summaries with executive summary, financial metrics, red flags and peer ratios.
           </p>
         </div>
 
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={() => setShowCreateModal(true)}
-        >
-          <Sparkles className="w-4 h-4 mr-1.5" />
-          Generate New Report
+        <Button variant="primary" size="md" onClick={() => setShowCreateModal(true)}>
+          <Sparkles className="w-4 h-4" />
+          Generate new report
         </Button>
       </div>
+
 
       {/* Main Grid: Left List (4 Cols) + Right Viewer (8 Cols) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -118,7 +115,7 @@ export const Reports = () => {
                   className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
                     isSelected
                       ? 'bg-emerald-500/15 border-emerald-500/40 shadow-glow-emerald'
-                      : 'bg-terminal-card border-terminal-border hover:border-slate-600'
+                      : 'bg-white/[0.05] border-white/10 hover:border-slate-600'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -133,7 +130,7 @@ export const Reports = () => {
                   <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
                     {rep.summary}
                   </p>
-                  <div className="mt-3 pt-2 border-t border-terminal-border/50 flex items-center justify-between text-[10px] font-mono text-slate-500">
+                  <div className="mt-3 pt-2 border-t border-white/[0.06] flex items-center justify-between text-[10px] font-mono text-slate-500">
                     <span>{rep.created_at ? rep.created_at.slice(0, 10) : 'Today'}</span>
                     <span className="text-emerald-400 font-medium">Click to Inspect →</span>
                   </div>
@@ -161,7 +158,7 @@ export const Reports = () => {
             >
               <div className="space-y-6 text-xs text-slate-300 leading-relaxed">
                 {/* Executive Summary Section */}
-                <div className="p-4 rounded-xl bg-terminal-dark/80 border border-terminal-border space-y-2">
+                <div className="p-4 rounded-xl glass-inset space-y-2">
                   <h4 className="font-bold text-slate-100 text-sm flex items-center gap-2 text-emerald-400">
                     <FileText className="w-4 h-4" />
                     <span>Executive Summary & Thesis</span>
@@ -179,19 +176,19 @@ export const Reports = () => {
                     <span>Key Financial Metrics & Operating Ratios</span>
                   </h4>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="p-3 rounded-lg bg-terminal-dark border border-terminal-border">
+                    <div className="p-3 rounded-lg glass-inset">
                       <span className="text-[10px] text-slate-400 uppercase">Revenue (FY24)</span>
                       <p className="text-lg font-bold font-mono text-slate-100 mt-1">$18,562M</p>
                     </div>
-                    <div className="p-3 rounded-lg bg-terminal-dark border border-terminal-border">
+                    <div className="p-3 rounded-lg glass-inset">
                       <span className="text-[10px] text-slate-400 uppercase">Operating Margin</span>
                       <p className="text-lg font-bold font-mono text-emerald-400 mt-1">20.7%</p>
                     </div>
-                    <div className="p-3 rounded-lg bg-terminal-dark border border-terminal-border">
+                    <div className="p-3 rounded-lg glass-inset">
                       <span className="text-[10px] text-slate-400 uppercase">FCF Conversion</span>
                       <p className="text-lg font-bold font-mono text-slate-100 mt-1">88.4%</p>
                     </div>
-                    <div className="p-3 rounded-lg bg-terminal-dark border border-terminal-border">
+                    <div className="p-3 rounded-lg glass-inset">
                       <span className="text-[10px] text-slate-400 uppercase">Large Deal TCV</span>
                       <p className="text-lg font-bold font-mono text-emerald-400 mt-1">$17.7B</p>
                     </div>
@@ -218,7 +215,7 @@ export const Reports = () => {
                 </div>
 
                 {/* Footer Citation verification */}
-                <div className="pt-3 border-t border-terminal-border/80 flex items-center justify-between text-[11px] font-mono text-slate-500">
+                <div className="pt-3 border-t border-white/[0.07] flex items-center justify-between text-[11px] font-mono text-slate-500">
                   <span>REPORT AGENT: MULTI-AGENT SYMBOLIC ENGINE</span>
                   <span className="text-emerald-400">CITATIONS VERIFIED AGAINST 20-F / Q4 TRANSCRIPT</span>
                 </div>
@@ -246,7 +243,7 @@ export const Reports = () => {
               value={titleInput}
               onChange={(e) => setTitleInput(e.target.value)}
               placeholder="e.g. FY24 Comprehensive Equity Research Note"
-              className="w-full bg-terminal-dark border border-terminal-border text-slate-200 text-xs rounded-lg py-2.5 px-3 focus:outline-none focus:border-emerald-500"
+              className="w-full glass-inset text-slate-200 text-xs rounded-lg py-2.5 px-3 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15"
               required
             />
           </div>
@@ -257,7 +254,7 @@ export const Reports = () => {
               type="text"
               value={companyInput}
               onChange={(e) => setCompanyInput(e.target.value)}
-              className="w-full bg-terminal-dark border border-terminal-border text-slate-200 text-xs rounded-lg py-2.5 px-3 focus:outline-none focus:border-emerald-500"
+              className="w-full glass-inset text-slate-200 text-xs rounded-lg py-2.5 px-3 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15"
             />
           </div>
 
