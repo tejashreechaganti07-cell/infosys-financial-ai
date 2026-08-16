@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File, Form, status, Query
+from fastapi import APIRouter, Depends, UploadFile, File, Form, status, Query, BackgroundTasks
 from typing import Optional
 from app.schemas.document import DocumentResponse, DocumentListResponse
 from app.services.document_service import DocumentService
@@ -8,6 +8,7 @@ router = APIRouter(prefix="/documents", tags=["Financial Documents"])
 
 @router.post("/upload", response_model=DocumentResponse, status_code=status.HTTP_201_CREATED)
 async def upload_document(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     workspace_id: str = Form(...),
     company_name: str = Form("Infosys Limited"),
@@ -22,7 +23,8 @@ async def upload_document(
         file=file,
         company_name=company_name,
         filing_type=filing_type,
-        fiscal_year=fiscal_year
+        fiscal_year=fiscal_year,
+        background_tasks=background_tasks
     )
 
 @router.get("", response_model=DocumentListResponse)

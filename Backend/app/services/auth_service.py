@@ -34,10 +34,12 @@ class AuthService:
         result = await users_col.insert_one(doc)
 
         saved_user = await users_col.find_one({"_id": user_id})
-        print("DATABASE:", db.name)
-        print("COLLECTION: users")
-        print("INSERTED ID:", result.inserted_id)
-        print("SAVED USER:", saved_user)
+        import logging
+        logger = logging.getLogger("uvicorn")
+        logger.debug(f"DATABASE: {db.name}")
+        logger.debug("COLLECTION: users")
+        logger.info(f"INSERTED ID: {result.inserted_id}")
+        logger.debug(f"SAVED USER: {saved_user}")
         
         user_resp = UserResponse(
             id=user_id,

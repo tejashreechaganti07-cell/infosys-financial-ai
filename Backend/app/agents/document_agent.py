@@ -51,8 +51,9 @@ def process_pdf(file_path):
     for page in pages:
         chunks = chunk_text(page["text"])
 
-        for chunk in chunks:
+        for index, chunk in enumerate(chunks, start=1):
             all_chunks.append({
+                "chunk_id": f"page_{page['page_number']}_chunk_{index}",
                 "page_number": page["page_number"],
                 "text": chunk
             })
