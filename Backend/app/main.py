@@ -24,17 +24,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Configure CORS for frontend Vite dev server (or Vercel deployed frontend)
-origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
-if settings.FRONTEND_URL and settings.FRONTEND_URL not in origins:
-    origins.append(settings.FRONTEND_URL)
-
+# Configure CORS for frontend Vite dev server
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

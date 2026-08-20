@@ -1,10 +1,14 @@
 import uuid
+import os
+import aiofiles
 from datetime import datetime, timezone
 from typing import List, Optional
-from app.core.db import get_db, get_grid_fs
+from app.core.db import get_db
 from app.schemas.document import DocumentResponse, DocumentListResponse
-from fastapi import UploadFile, HTTPException, status, BackgroundTasks
-from app.services.pipeline_service import PipelineService
+from fastapi import UploadFile, HTTPException, status
+
+UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 class DocumentService:
     @staticmethod
@@ -14,11 +18,9 @@ class DocumentService:
         file: UploadFile,
         company_name: str,
         filing_type: str,
-        fiscal_year: int,
-        background_tasks: BackgroundTasks
+        fiscal_year: int
     ) -> DocumentResponse:
         db = get_db()
-        grid_fs = get_grid_fs()
         ws_col = db["workspaces"]
         docs_col = db["documents"]
         
@@ -29,18 +31,15 @@ class DocumentService:
         doc_id = f"doc_{uuid.uuid4().hex[:12]}"
         now_str = datetime.now(timezone.utc).isoformat()
         
+        # Save file to uploads directory
+        file_filename = f"{doc_id}_{file.filename}"
+        file_path = os.path.join(UPLOAD_DIR, file_filename)
+        
         content = await file.read()
         file_size = len(content)
-        file_filename = f"{doc_id}_{file.filename}"
         
-        # Upload to GridFS
-        grid_in = grid_fs.open_upload_stream(
-            file_filename,
-            metadata={"content_type": file.content_type, "workspace_id": workspace_id, "user_id": user_id}
-        )
-        await grid_in.write(content)
-        await grid_in.close()
-        grid_file_id = str(grid_in._id)
+        async with aiofiles.open(file_path, 'wb') as out_file:
+            await out_file.write(content)
         
         # Estimated chunk count based on file size
         chunks_count = max(10, file_size // 2500)
@@ -53,8 +52,7 @@ class DocumentService:
             "fiscal_year": int(fiscal_year) if fiscal_year else 2024,
             "workspace_id": workspace_id,
             "user_id": user_id,
-            "file_path": f"gridfs://{grid_file_id}",
-            "grid_fs_id": grid_file_id,
+            "file_path": f"uploads/{file_filename}",
             "file_size": file_size,
             "status": "INDEXED",
             "is_seed": False,
@@ -69,17 +67,6 @@ class DocumentService:
             {"_id": workspace_id},
             {"$inc": {"documents_count": 1}, "$set": {"updated_at": now_str}}
         )
-        
-        # Trigger the AI agent pipeline in the background
-        # Since BackgroundTasks runs in the same event loop, we can just pass the coroutine
-        import asyncio
-        background_tasks.add_task(
-            PipelineService.run_full_pipeline,
-            document_id=doc_id,
-            grid_fs_id=grid_file_id,
-            company_name=doc["company_name"]
-        )
-        
         
         return DocumentResponse(
             id=doc_id,
@@ -154,7 +141,6 @@ class DocumentService:
     @staticmethod
     async def delete_document(user_id: str, doc_id: str) -> bool:
         db = get_db()
-        grid_fs = get_grid_fs()
         docs_col = db["documents"]
         ws_col = db["workspaces"]
         
@@ -163,15 +149,6 @@ class DocumentService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
             
         await docs_col.delete_one({"_id": doc_id})
-        
-        # Delete from GridFS if present
-        if doc.get("grid_fs_id"):
-            from bson.objectid import ObjectId
-            try:
-                await grid_fs.delete(ObjectId(doc["grid_fs_id"]))
-            except Exception as e:
-                import logging
-                logging.getLogger("uvicorn").error(f"Failed to delete GridFS file: {e}")
         
         # Decrement workspace document count
         if doc.get("workspace_id"):
