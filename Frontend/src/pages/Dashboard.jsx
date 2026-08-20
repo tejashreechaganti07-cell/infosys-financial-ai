@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { dashboardService } from '../services/dashboardService';
+import { dashboardService } from '../api';
 import { StatsCards } from '../components/dashboard/StatsCards';
 import { RecentDocuments } from '../components/dashboard/RecentDocuments';
 import { RecentWorkspaces } from '../components/dashboard/RecentWorkspaces';
