@@ -1,6 +1,5 @@
 import logging
 from typing import List, Dict, Any
-from bson.objectid import ObjectId
 from app.core.db import get_db, get_grid_fs
 from .config import COLLECTION_CHUNKS, COLLECTION_EMBEDDINGS, COLLECTION_TABLES, COLLECTION_DOCUMENTS
 from .schemas import DocumentChunk, DocumentTable
@@ -11,10 +10,9 @@ logger = logging.getLogger(__name__)
 class StorageManager:
     @staticmethod
     async def get_pdf_bytes_from_gridfs(grid_fs_id: str) -> bytes:
-        from bson.objectid import ObjectId
         grid_fs = get_grid_fs()
         try:
-            grid_out = await grid_fs.open_download_stream(ObjectId(grid_fs_id))
+            grid_out = await grid_fs.open_download_stream(grid_fs_id)
             file_bytes = await grid_out.read()
             return file_bytes
         except Exception as e:
