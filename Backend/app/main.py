@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.core.db import DatabaseManager
+from app.core.database import DatabaseManager
 from app.api import users, workspaces, documents, dashboard, chat, reports
 
 @asynccontextmanager
@@ -47,7 +47,7 @@ async def health_check():
         "status": "online",
         "service": settings.PROJECT_NAME,
         "version": settings.VERSION,
-        "database": "mock_in_memory" if DatabaseManager.is_mock else "live_mongodb"
+        "database": "live_mongodb"
     }
 
 @app.get("/", tags=["System Status"])
@@ -60,5 +60,9 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
+    # Switch working directory to the Backend root so that uvicorn subprocesses can find 'app'
+    backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    os.chdir(backend_dir)
+    if backend_dir not in sys.path:
+        sys.path.insert(0, backend_dir)
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
-
