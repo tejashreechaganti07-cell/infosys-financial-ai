@@ -1,7 +1,9 @@
 from crewai import Agent
 from crewai.tools import tool
-
 from pypdf import PdfReader
+import json
+import re
+
 
 def read_pdf(file_path):
     reader = PdfReader(file_path)
@@ -40,73 +42,148 @@ def chunk_text(text, chunk_size=4000, overlap=400):
     return chunks
 
 
-@tool
-def process_pdf(file_path):
-    """Read a financial PDF, extract its text, create chunks, and return metadata."""
-    
-    pages = read_pdf(file_path)
+def detect_sections(text):
+    """
+    Detect section headings throughout the extracted PDF text.
+    Returns a list of (section_name, section_text) pairs.
+    """
 
-    all_chunks = []
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
 
-    for page in pages:
-        chunks = chunk_text(page["text"])
+    if not lines:
+        return [("General", "")]
 
-        for chunk in chunks:
-            all_chunks.append({
-                "page_number": page["page_number"],
-                "text": chunk
-            })
-
-    metadata = create_metadata(
-        file_path,
-        pages,
-        all_chunks
+    # Common section heading patterns
+    heading_pattern = re.compile(
+        r"^(Introduction|Data Collection|Data Analysis|Risk Management|"
+        r"Conclusion|Overview|Summary|Methodology|Results|Discussion|"
+        r"Financial Analysis|Company Overview|Financial Statements|"
+        r"Revenue|Expenses|Profit|References)$",
+        re.IGNORECASE
     )
 
-    return {
-        "pages": pages,
-        "chunks": all_chunks,
-        "metadata": metadata
+    sections = []
+    current_section = "General"
+    current_lines = []
+
+    for line in lines:
+
+        # Check whether this line is a section heading
+        if heading_pattern.match(line):
+
+            # Save previous section
+            if current_lines:
+                sections.append(
+                    (current_section, "\n".join(current_lines).strip())
+                )
+
+            # Start new section
+            current_section = line
+            current_lines = []
+
+        else:
+            current_lines.append(line)
+
+    # Save final section
+    if current_lines:
+        sections.append(
+            (current_section, "\n".join(current_lines).strip())
+        )
+
+    return sections
+
+
+@tool
+def process_pdf(file_path):
+    """
+    Read a financial PDF, extract text, detect sections,
+    create chunks, and return section-wise JSON.
+    """
+
+    pages = read_pdf(file_path)
+
+    sections = {}
+
+    for page in pages:
+
+        page_number = page["page_number"]
+        text = page["text"]
+
+        if not text.strip():
+            continue
+
+        detected_sections = detect_sections(text)
+
+        for section_name, section_text in detected_sections:
+
+            if section_name not in sections:
+                sections[section_name] = {
+                    "pages": [],
+                    "chunks": []
+                }
+
+            if page_number not in sections[section_name]["pages"]:
+                sections[section_name]["pages"].append(page_number)
+
+            chunks = chunk_text(section_text)
+
+            for chunk in chunks:
+                sections[section_name]["chunks"].append(chunk)
+
+    result = {
+        "filename": file_path,
+        "file_type": "application/pdf",
+        "page_count": len(pages),
+        "section_count": len(sections),
+        "sections": sections
     }
 
-def create_metadata(file_path, pages, chunks):
-    return {
-        "filename": file_path,
-        "page_count": len(pages),
-        "chunk_count": len(chunks),
-        "file_type": "application/pdf"
-    }
+    return json.dumps(result, indent=2)
+
 
 document_agent = Agent(
     role="Financial Document Processing Specialist",
-    goal="Process uploaded financial documents and prepare them for downstream analysis.",
+
+    goal=(
+        "Process uploaded financial documents and prepare "
+        "section-wise structured data for downstream analysis."
+    ),
+
     backstory=(
         "You are responsible for processing financial documents. "
-        "You validate documents, understand their content, and prepare "
-        "clean information for the next financial analysis agents."
+        "You validate documents, extract their content, identify "
+        "sections, and prepare clean structured information for "
+        "the next financial analysis agents."
     ),
+
     tools=[process_pdf],
     verbose=True,
     allow_delegation=False
 )
+
 
 from crewai import Task
 
 
 document_task = Task(
     description=(
-    "Process the uploaded financial document. "
-    "Use the document processing tool to validate the PDF, "
-    "extract its text, create chunks, and generate metadata. "
-    "Return the parsed document information, chunks, and metadata "
-    "for downstream financial analysis."
+        "Process the uploaded financial document. "
+        "Use the document processing tool to validate the PDF, "
+        "extract its text, identify document sections, create chunks, "
+        "and organize the extracted information section-wise. "
+        "Return the processed document as JSON with sections, "
+        "page numbers, and chunks for downstream financial analysis."
     ),
+
     expected_output=(
-        "Clean and structured information from the uploaded "
-        "financial document, ready for downstream analysis."
+        "A valid JSON-formatted representation of the financial "
+        "document with the extracted data divided section-wise, "
+        "including page numbers and text chunks."
     ),
+
     agent=document_agent
 )
+
 
 from crewai import Crew
 
