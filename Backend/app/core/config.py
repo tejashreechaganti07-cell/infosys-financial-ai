@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"
 
 settings = Settings()
-print("MONGODB_URL:", settings.MONGODB_URL)
+print("MONGODB_URI:", settings.MONGODB_URI)
