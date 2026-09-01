@@ -404,7 +404,7 @@ class ExtractionProcessor:
 
         try:
 
-            result = crew.kickoff()
+            result = await crew.kickoff_async()
 
             logger.info(
                 "Extraction Agent completed for %s",
