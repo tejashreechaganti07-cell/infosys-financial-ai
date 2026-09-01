@@ -14,9 +14,9 @@ __pycache__/
 
 # Node / frontend
 node_modules/
-frontend/node_modules/
-frontend/dist/
-frontend/build/
+Frontend/node_modules/
+Frontend/dist/
+Frontend/build/
 .vite/
 *.log
 npm-debug.log*
@@ -24,7 +24,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Application runtime artifacts
-backend/app/uploads/
+Backend/app/uploads/
 coverage/
 *.sqlite3
 *.db
