@@ -2,7 +2,7 @@ import asyncio
 import httpx
 from httpx import ASGITransport
 from app.main import app
-from app.core.db import DatabaseManager
+from app.core.database import DatabaseManager
 
 async def run_backend_tests():
     print("=== STARTING BACKEND TESTS ===")
