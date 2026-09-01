@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
+import { EmptyState } from '../common/EmptyState';
 import { Layers, FileText, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -16,9 +17,19 @@ export const RecentWorkspaces = ({ workspaces = [] }) => {
       }
     >
       {workspaces.length === 0 ? (
-        <div className="py-8 text-center text-slate-500 text-xs">
-          No active workspaces.
-        </div>
+        <EmptyState
+          icon={Layers}
+          title="No active research sessions"
+          description="Create a workspace to ingest filings and run the multi-agent research pipeline against them."
+          action={
+            <Link
+              to="/workspace"
+              className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg text-xs font-semibold text-white bg-brand-600 hover:bg-brand-500 transition-colors"
+            >
+              Launch workspace <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          }
+        />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {workspaces.map((ws) => (

@@ -5,6 +5,7 @@ import { Badge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
 import { Loader } from '../components/common/Loader';
 import { Modal } from '../components/common/Modal';
+import { EmptyState } from '../components/common/EmptyState';
 import { FileText, Download, Eye, Plus, Sparkles, CheckCircle2, ShieldAlert, BarChart2 } from 'lucide-react';
 
 export const Reports = () => {
@@ -105,6 +106,20 @@ export const Reports = () => {
             Available Reports ({reports.length})
           </h3>
           <div className="space-y-2.5">
+            {reports.length === 0 && (
+              <EmptyState
+                icon={FileText}
+                title="No reports generated"
+                description="Run the Report Agent on an indexed filing to produce a cited investment summary."
+                action={
+                  <Button variant="primary" size="sm" onClick={() => setShowCreateModal(true)}>
+                    <Sparkles className="w-4 h-4" />
+                    Generate new report
+                  </Button>
+                }
+              />
+            )}
+
             {reports.map((rep) => {
               const isSelected = selectedReport?.id === rep.id;
 
