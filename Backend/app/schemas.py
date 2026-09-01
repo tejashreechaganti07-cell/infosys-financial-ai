@@ -117,6 +117,15 @@ class ComparisonItemSchema(BaseModel):
     roe: str
     fcf_conversion: str
 
+class FinancialMetricsOutput(BaseModel):
+    metrics: List[FinancialMetricSchema]
+
+class RedFlagsOutput(BaseModel):
+    red_flags: List[RedFlagSchema]
+
+class ComparisonOutput(BaseModel):
+    comparison: List[ComparisonItemSchema]
+
 class ReportSectionsSchema(BaseModel):
     executive_summary: str
     key_financials: List[FinancialMetricSchema]

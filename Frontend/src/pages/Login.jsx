@@ -110,7 +110,7 @@ export const Login = () => {
         </div>
 
         <p className="text-[11px] text-slate-600">
-          Infosys Internship · Multi-Agent Financial Research System
+          Infosys Internship · Development of Multi-Agent AI Analysis System for Financial Research and Business Insights
         </p>
       </div>
 

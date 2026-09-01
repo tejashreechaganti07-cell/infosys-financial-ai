@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import DatabaseManager
-from app.api import users, workspaces, documents, dashboard, chat, reports
+from app.api import users, workspaces, documents, dashboard, chat, reports, analysis
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Backend API for the Multi-Agent Financial Research System (Phase 1)",
+    description="Backend API for the Development of Multi-Agent AI Analysis System for Financial Research and Business Insights (Phase 1)",
     lifespan=lifespan
 )
 
@@ -40,6 +40,7 @@ app.include_router(documents.router, prefix=settings.API_V1_STR)
 app.include_router(dashboard.router, prefix=settings.API_V1_STR)
 app.include_router(chat.router, prefix=settings.API_V1_STR)
 app.include_router(reports.router, prefix=settings.API_V1_STR)
+app.include_router(analysis.router, prefix=settings.API_V1_STR)
 
 @app.get("/health", tags=["System Status"])
 async def health_check():
@@ -53,7 +54,7 @@ async def health_check():
 @app.get("/", tags=["System Status"])
 async def root():
     return {
-        "message": "Welcome to the Multi-Agent Financial Research System API (Phase 1)",
+        "message": "Welcome to the Development of Multi-Agent AI Analysis System for Financial Research and Business Insights API (Phase 1)",
         "docs": "/docs",
         "health": "/health"
     }
