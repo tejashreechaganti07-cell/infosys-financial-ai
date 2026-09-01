@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Backend API for the Multi-Agent Financial Research System (Phase 1)",
+    description="Backend API for the Development of Multi-Agent AI Analysis System for Financial Research and Business Insights (Phase 1)",
     lifespan=lifespan
 )
 
@@ -54,7 +54,7 @@ async def health_check():
 @app.get("/", tags=["System Status"])
 async def root():
     return {
-        "message": "Welcome to the Multi-Agent Financial Research System API (Phase 1)",
+        "message": "Welcome to the Development of Multi-Agent AI Analysis System for Financial Research and Business Insights API (Phase 1)",
         "docs": "/docs",
         "health": "/health"
     }

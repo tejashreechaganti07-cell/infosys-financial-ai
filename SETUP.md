@@ -1,6 +1,6 @@
-# Setup Guide: Multi-Agent Financial Research System
+# Setup Guide: Development of Multi-Agent AI Analysis System for Financial Research and Business Insights
 
-This document outlines the detailed steps required to set up the development environment for the Multi-Agent Financial Research System. The project consists of a React/Vite frontend and a Python/FastAPI backend using MongoDB Atlas and CrewAI.
+This document outlines the detailed steps required to set up the development environment for the Development of Multi-Agent AI Analysis System for Financial Research and Business Insights. The project consists of a React/Vite frontend and a Python/FastAPI backend using MongoDB Atlas and CrewAI.
 
 ## Prerequisites
 

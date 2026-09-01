@@ -1,10 +1,10 @@
-# Multi-Agent Financial Research System
+# Development of Multi-Agent AI Analysis System for Financial Research and Business Insights
 
 An AI-powered financial research platform that leverages multiple specialized AI agents to analyze company financial documents, extract key insights, identify financial risks, compare companies, answer research queries, and generate analyst-style reports.
 
 ## Project Overview
 
-The **Multi-Agent Financial Research System** is designed to streamline complex financial analysis for students, researchers, and financial analysts. The platform enables users to upload lengthy financial documents (such as Annual Reports and 10-K filings), automatically parse and analyze them using a series of specialized AI agents, and generate structured, source-grounded financial insights.
+The **Development of Multi-Agent AI Analysis System for Financial Research and Business Insights** is designed to streamline complex financial analysis for students, researchers, and financial analysts. The platform enables users to upload lengthy financial documents (such as Annual Reports and 10-K filings), automatically parse and analyze them using a series of specialized AI agents, and generate structured, source-grounded financial insights.
 
 By utilizing a multi-agent architecture powered by CrewAI and Large Language Models, the system orchestrates dedicated agents to manage discrete tasks within the financial research workflow.
 
