@@ -67,56 +67,6 @@ export const Profile = () => {
             </div>
           </div>
         </Card>
-
-        {/* Project & API Card */}
-        <Card title="Project & API Reference" subtitle="FastAPI REST API & Motor Driver">
-          <div className="space-y-4 text-xs">
-            <div className="p-3.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-emerald-400">FastAPI Swagger UI</span>
-                <Badge variant="emerald">READY</Badge>
-              </div>
-              <p className="text-slate-300 leading-relaxed">
-                Live interactive Swagger API documentation is running on port 8000.
-              </p>
-              <a
-                href="http://localhost:8000/docs"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-semibold pt-1"
-              >
-                <span>Open http://localhost:8000/docs</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </div>
-
-            <div className="space-y-2 text-slate-400">
-              <div className="flex items-center justify-between">
-                <span>Backend Framework:</span>
-                <span className="font-mono text-slate-200">FastAPI (Python 3.12)</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Database Engine:</span>
-                <span className="font-mono text-emerald-400">MongoDB / Motor Async</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Frontend Build:</span>
-                <span className="font-mono text-slate-200">React + Vite + Tailwind CSS</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Hallucination Prevention:</span>
-                <span className="font-mono text-cyan-400">STRICT SOURCE CITATIONS</span>
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-white/10 flex justify-end">
-              <Button variant="secondary" size="sm" onClick={handleResetDemo}>
-                <RefreshCw className="w-4 h-4 mr-1.5" />
-                Reset Demo Session
-              </Button>
-            </div>
-          </div>
-        </Card>
       </div>
     </div>
   );
