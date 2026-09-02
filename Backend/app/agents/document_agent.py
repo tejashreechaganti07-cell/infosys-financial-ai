@@ -23,22 +23,23 @@ def chunk_text(text, chunk_size=4000, overlap=400):
     chunks = []
 
     start = 0
-
     while start < len(text):
         end = start + chunk_size
-
         chunk = text[start:end].strip()
-
         if chunk:
             chunks.append(chunk)
-
         if end >= len(text):
             break
-
         start = end - overlap
-
     return chunks
 
+class DocumentProcessor:
+    @staticmethod
+    async def process_document(document_id: str, file_path: str):
+        logger.info(f"Starting optimized document processing for {document_id}")
+        
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"PDF file not found: {file_path}")
 
 @tool
 def process_pdf(file_path):

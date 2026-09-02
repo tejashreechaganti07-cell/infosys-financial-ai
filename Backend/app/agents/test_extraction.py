@@ -6,8 +6,8 @@ from pathlib import Path
 backend_dir = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(backend_dir))
 
-from app.agents.Single_Extraction_agent import ExtractionProcessor
-from app.core.db import get_db, db_manager
+from app.agents.extraction_agent import ExtractionProcessor
+from app.core.database import get_db, DatabaseManager as db_manager
 
 
 async def test():

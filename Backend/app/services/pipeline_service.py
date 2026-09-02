@@ -1,6 +1,6 @@
 import logging
 
-from app.agents.document_agent.processor import DocumentProcessor
+from app.agents.document_agent import DocumentProcessor
 from app.agents.extraction_agent import ExtractionProcessor
 
 logger = logging.getLogger(__name__)

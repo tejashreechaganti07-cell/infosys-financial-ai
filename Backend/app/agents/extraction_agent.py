@@ -6,7 +6,7 @@ from crewai import Agent, Task, Crew
 from crewai.tools import tool
 from pydantic import BaseModel, Field
 
-from app.core.db import get_db
+from app.core.database import get_db
 
 logger = logging.getLogger(__name__)
 
