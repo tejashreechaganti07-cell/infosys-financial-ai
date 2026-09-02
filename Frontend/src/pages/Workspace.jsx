@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { workspaceService } from '../services/workspaceService';
-import { documentService } from '../services/documentService';
+import { workspaceService } from '../api';
+import { documentService } from '../api';
 import { UploadPanel } from '../components/workspace/UploadPanel';
 import { DocumentList } from '../components/workspace/DocumentList';
 import { ChatWindow } from '../components/workspace/ChatWindow';

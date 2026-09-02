@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
 import { FileText, Trash2, CheckCircle2, Database, Shield } from 'lucide-react';
-import { documentService } from '../../services/documentService';
+import { documentService } from '../../api';
 
 export const DocumentList = ({ documents = [], onDeleteSuccess }) => {
   const handleDelete = async (id, title) => {
