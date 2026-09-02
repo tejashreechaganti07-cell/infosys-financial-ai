@@ -107,9 +107,27 @@ export const Sidebar = ({ mobileOpen = false, onClose = () => {} }) => {
           </nav>
         </div>
 
-        {/* Bottom: profile */}
+        {/* Bottom: engine status + profile */}
         <div className="relative p-4 space-y-3 border-t border-white/[0.06]">
-
+          <div className="glass rounded-xl p-3.5 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Cpu className="w-4 h-4 text-accent-300" />
+                <span className="text-xs font-semibold text-slate-200">Agents Engine</span>
+              </div>
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-brand-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse" />
+                Active
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              Document, Extraction, Red Flag &amp; Comparison agents coordinated.
+            </p>
+            <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 pt-2 border-t glass-divider">
+              <span>DB: MONGODB</span>
+              <span className="text-brand-300">0 HALLUCINATION</span>
+            </div>
+          </div>
 
           <div className="flex items-center gap-3 px-1.5 py-1">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-500 to-accent-600 flex items-center justify-center text-white font-bold text-xs shrink-0">

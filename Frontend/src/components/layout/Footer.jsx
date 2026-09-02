@@ -4,7 +4,7 @@ export const Footer = () => {
   return (
     <footer className="h-11 shrink-0 border-t border-white/[0.06] bg-[#070B16]/60 backdrop-blur-xl flex items-center justify-between gap-4 px-4 sm:px-6 text-[10px] sm:text-[11px] text-slate-500">
       <span className="truncate tracking-wide">
-        Infosys · Multi-Agent Financial Research System
+        Infosys · Development of Multi-Agent AI Analysis System for Financial Research and Business Insights
       </span>
       <div className="hidden sm:flex items-center gap-4 font-mono">
         <span className="flex items-center gap-1.5">

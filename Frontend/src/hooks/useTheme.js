@@ -3,10 +3,10 @@ import { useCallback, useEffect, useState } from 'react';
 const STORAGE_KEY = 'app-theme';
 
 export const getInitialTheme = () => {
-  if (typeof window === 'undefined') return 'light';
+  if (typeof window === 'undefined') return 'dark';
   const stored = window.localStorage.getItem(STORAGE_KEY);
   if (stored === 'light' || stored === 'dark') return stored;
-  return 'light';
+  return 'dark';
 };
 
 export const applyTheme = (theme) => {
