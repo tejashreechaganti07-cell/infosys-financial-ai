@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { reportService } from '../api';
-import { Card } from '../components/common/Card';
-import { Badge } from '../components/common/Badge';
-import { Button } from '../components/common/Button';
-import { Loader } from '../components/common/Loader';
-import { Modal } from '../components/common/Modal';
-import { FileText, Download, Eye, Plus, Sparkles, CheckCircle2, ShieldAlert, BarChart2 } from 'lucide-react';
+import { reportService } from '../services/reportService';
+import { PageHead, CardHead, Empty, formatDate } from '../components/app/ui';
+import {
+  FileText,
+  Download,
+  Sparkles,
+  ShieldAlert,
+  BarChart2,
+  FileCheck,
+  CheckCircle2,
+} from 'lucide-react';
+import './dashboard.css';
+import './app-pages.css';
 
 export const Reports = () => {
   const [reports, setReports] = useState([]);
@@ -21,11 +27,9 @@ export const Reports = () => {
     try {
       const list = await reportService.getReports();
       setReports(list);
-      if (list.length > 0 && !selectedReport) {
-        setSelectedReport(list[0]);
-      }
+      if (list.length > 0 && !selectedReport) setSelectedReport(list[0]);
     } catch (err) {
-      console.error("Failed to load reports:", err);
+      console.error('Failed to load reports:', err);
     } finally {
       setLoading(false);
     }
@@ -40,17 +44,13 @@ export const Reports = () => {
     if (!titleInput.trim()) return;
     setGenerating(true);
     try {
-      const newRep = await reportService.createReport(
-        titleInput.trim(),
-        "ws_demo_infy_2024",
-        companyInput
-      );
+      const newRep = await reportService.createReport(titleInput.trim(), 'ws_demo_infy_2024', companyInput);
       setReports((prev) => [newRep, ...prev]);
       setSelectedReport(newRep);
       setShowCreateModal(false);
       setTitleInput('');
     } catch (err) {
-      alert("Failed to generate report.");
+      alert('Failed to generate report.');
     } finally {
       setGenerating(false);
     }
@@ -68,216 +68,223 @@ export const Reports = () => {
       link.click();
       document.body.removeChild(link);
     } catch (err) {
-      alert("Failed to export markdown report.");
+      alert('Failed to export markdown report.');
     }
   };
 
-  if (loading && reports.length === 0) {
-    return <Loader text="Loading Analyst Reports & Document Summaries..." />;
-  }
-
   return (
-    <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
-        <div>
-          <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-2xl font-bold text-slate-50 tracking-tight">Analyst research reports</h1>
-            <Badge variant="cyan">Automated report agent</Badge>
-          </div>
-          <p className="text-sm text-slate-400 mt-2 max-w-2xl">
-            Structured investment summaries with executive summary, financial metrics, red flags and peer ratios.
-          </p>
-        </div>
+    <main className="dash-body">
+      <PageHead
+        eyebrow="Report agent"
+        title="Analyst Reports"
+        subtitle="Structured investment summaries with metrics, red flags and peer ratios — each cited to its filing."
+        actions={
+          <button type="button" className="dash-btn dash-btn-primary" onClick={() => setShowCreateModal(true)}>
+            <Sparkles className="w-4 h-4" />
+            Generate Report
+          </button>
+        }
+      />
 
-        <Button variant="primary" size="md" onClick={() => setShowCreateModal(true)}>
-          <Sparkles className="w-4 h-4" />
-          Generate new report
-        </Button>
-      </div>
-
-
-      {/* Main Grid: Left List (4 Cols) + Right Viewer (8 Cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left List */}
-        <div className="lg:col-span-4 space-y-3">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 px-1">
-            Available Reports ({reports.length})
-          </h3>
-          <div className="space-y-2.5">
-            {reports.map((rep) => {
-              const isSelected = selectedReport?.id === rep.id;
-
-              return (
-                <div
-                  key={rep.id}
-                  onClick={() => setSelectedReport(rep)}
-                  className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-emerald-500/15 border-emerald-500/40 shadow-glow-emerald'
-                      : 'bg-white/[0.05] border-white/10 hover:border-slate-600'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-mono text-emerald-400 font-semibold uppercase">
-                      {rep.company_name}
-                    </span>
-                    <Badge variant="emerald">{rep.status}</Badge>
-                  </div>
-                  <h4 className="font-semibold text-slate-100 text-sm mt-1.5 line-clamp-1">
-                    {rep.title}
-                  </h4>
-                  <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
-                    {rep.summary}
-                  </p>
-                  <div className="mt-3 pt-2 border-t border-white/[0.06] flex items-center justify-between text-[10px] font-mono text-slate-500">
-                    <span>{rep.created_at ? rep.created_at.slice(0, 10) : 'Today'}</span>
-                    <span className="text-emerald-400 font-medium">Click to Inspect →</span>
-                  </div>
+      <section className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+        <div className="xl:col-span-4">
+          <article className="dash-card dash-reveal">
+            <CardHead title="Available Reports" subtitle={`${reports.length} generated`} />
+            <div className="p-2.5">
+              {loading && reports.length === 0 ? (
+                <div className="space-y-2.5">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="dash-skel h-14 w-full" />
+                  ))}
                 </div>
-              );
-            })}
-          </div>
+              ) : reports.length === 0 ? (
+                <Empty
+                  Icon={FileText}
+                  title="No reports generated"
+                  description="Run the Report Agent on an indexed filing to produce a cited investment summary."
+                  actionLabel="Generate Report"
+                  onAction={() => setShowCreateModal(true)}
+                />
+              ) : (
+                reports.map((rep) => {
+                  const active = selectedReport?.id === rep.id;
+                  return (
+                    <button
+                      key={rep.id}
+                      type="button"
+                      onClick={() => setSelectedReport(rep)}
+                      className={`dash-row w-full text-left ${active ? 'is-active' : ''}`}
+                    >
+                      <span
+                        className="dash-row-icon"
+                        style={{ background: active ? '#EEF4FF' : '#F2EEFF', color: active ? '#2563EB' : '#6D4AFF' }}
+                      >
+                        <FileCheck className="w-[17px] h-[17px]" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[13px] font-semibold text-slate-800 truncate">{rep.title}</span>
+                        <span className="block app-meta truncate">
+                          {rep.company_name} • {formatDate(rep.created_at)}
+                        </span>
+                      </span>
+                      <span className="dash-badge badge-ok">{rep.status || 'Ready'}</span>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </article>
         </div>
 
-        {/* Right Report Viewer */}
-        <div className="lg:col-span-8">
+        <div className="xl:col-span-8">
           {selectedReport ? (
-            <Card
-              title={selectedReport.title}
-              subtitle={`${selectedReport.company_name} • Grounded in Source Documents`}
-              headerAction={
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => handleExportMarkdown(selectedReport.id, selectedReport.title)}
-                >
-                  <Download className="w-4 h-4 mr-1.5" /> Export Markdown / PDF
-                </Button>
-              }
-            >
-              <div className="space-y-6 text-xs text-slate-300 leading-relaxed">
-                {/* Executive Summary Section */}
-                <div className="p-4 rounded-xl glass-inset space-y-2">
-                  <h4 className="font-bold text-slate-100 text-sm flex items-center gap-2 text-emerald-400">
-                    <FileText className="w-4 h-4" />
-                    <span>Executive Summary & Thesis</span>
+            <article className="dash-card dash-reveal">
+              <CardHead
+                title={selectedReport.title}
+                subtitle={`${selectedReport.company_name} • Grounded in source documents`}
+                right={
+                  <button
+                    type="button"
+                    className="dash-btn dash-btn-ghost"
+                    onClick={() => handleExportMarkdown(selectedReport.id, selectedReport.title)}
+                  >
+                    <Download className="w-4 h-4" />
+                    Export
+                  </button>
+                }
+              />
+
+              <div className="p-4 space-y-4 text-[13.5px] leading-relaxed text-slate-600">
+                <div className="app-block">
+                  <h4 className="app-block-title">
+                    <FileText className="w-4 h-4 text-[#2563EB]" />
+                    Executive summary
                   </h4>
-                  <p className="whitespace-pre-line text-slate-300">
+                  <p className="whitespace-pre-line">
                     {selectedReport.summary ||
-                      "Infosys Limited demonstrated resilient performance in FY2024, achieving revenues of $18.56B (+1.9% YoY) amidst macroeconomic volatility. Large deal wins surged 80.6% to a record $17.7B TCV, reinforcing client confidence in enterprise AI transformation and Project Maximus cost optimization."}
+                      'The Report Agent has not returned a summary for this report yet. Once the agents finish synthesising the indexed filings, the executive thesis will appear here.'}
                   </p>
                 </div>
 
-                {/* Extracted Metrics Table */}
-                <div className="space-y-3">
-                  <h4 className="font-bold text-slate-100 text-sm flex items-center gap-2">
-                    <BarChart2 className="w-4 h-4 text-emerald-400" />
-                    <span>Key Financial Metrics & Operating Ratios</span>
+                <div className="space-y-2.5">
+                  <h4 className="app-block-title px-0.5">
+                    <BarChart2 className="w-4 h-4 text-[#6D4AFF]" />
+                    Key financial metrics
                   </h4>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="p-3 rounded-lg glass-inset">
-                      <span className="text-[10px] text-slate-400 uppercase">Revenue (FY24)</span>
-                      <p className="text-lg font-bold font-mono text-slate-100 mt-1">$18,562M</p>
+                  {selectedReport.metrics && Object.keys(selectedReport.metrics).length > 0 ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {Object.entries(selectedReport.metrics).map(([k, v]) => (
+                        <div key={k} className="app-metric">
+                          <span>{k}</span>
+                          <strong>{String(v)}</strong>
+                        </div>
+                      ))}
                     </div>
-                    <div className="p-3 rounded-lg glass-inset">
-                      <span className="text-[10px] text-slate-400 uppercase">Operating Margin</span>
-                      <p className="text-lg font-bold font-mono text-emerald-400 mt-1">20.7%</p>
-                    </div>
-                    <div className="p-3 rounded-lg glass-inset">
-                      <span className="text-[10px] text-slate-400 uppercase">FCF Conversion</span>
-                      <p className="text-lg font-bold font-mono text-slate-100 mt-1">88.4%</p>
-                    </div>
-                    <div className="p-3 rounded-lg glass-inset">
-                      <span className="text-[10px] text-slate-400 uppercase">Large Deal TCV</span>
-                      <p className="text-lg font-bold font-mono text-emerald-400 mt-1">$17.7B</p>
-                    </div>
-                  </div>
+                  ) : (
+                    <Empty
+                      Icon={BarChart2}
+                      title="No extracted metrics"
+                      description="Metrics appear here once the Extraction Agent has parsed the underlying filing."
+                    />
+                  )}
                 </div>
 
-                {/* Red Flags Summary */}
-                <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 space-y-2">
-                  <h4 className="font-bold text-amber-400 text-sm flex items-center gap-2">
-                    <ShieldAlert className="w-4 h-4" />
-                    <span>Risk Analysis & Auditor Verification</span>
+                <div className="space-y-2.5">
+                  <h4 className="app-block-title px-0.5">
+                    <ShieldAlert className="w-4 h-4 text-[#B4791F]" />
+                    Risk analysis
                   </h4>
-                  <ul className="list-disc list-inside space-y-1.5 text-slate-300">
-                    <li>
-                      <strong>BFS Discretionary Spend Softness:</strong> Longer deal conversion cycles in US financial services.
-                    </li>
-                    <li>
-                      <strong>Offshore Wage Revision Schedule:</strong> Planned wage increases in H1 FY25 may temporarily compress EBIT margins.
-                    </li>
-                    <li>
-                      <strong>Auditor Clean Assessment:</strong> Independent auditor (Deloitte Haskins & Sells) verified clean statutory books with zero going-concern warnings.
-                    </li>
-                  </ul>
+                  {selectedReport.red_flags && selectedReport.red_flags.length > 0 ? (
+                    <div className="app-block app-block-warn space-y-2">
+                      {selectedReport.red_flags.map((flag, i) => (
+                        <p key={i} className="flex gap-2">
+                          <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5 text-[#B4791F]" />
+                          <span>{typeof flag === 'string' ? flag : flag.description || flag.title}</span>
+                        </p>
+                      ))}
+                    </div>
+                  ) : (
+                    <Empty
+                      Icon={ShieldAlert}
+                      title="No red flags recorded"
+                      description="The Risk Agent has not flagged any issues for this report."
+                    />
+                  )}
                 </div>
 
-                {/* Footer Citation verification */}
-                <div className="pt-3 border-t border-white/[0.07] flex items-center justify-between text-[11px] font-mono text-slate-500">
-                  <span>REPORT AGENT: MULTI-AGENT SYMBOLIC ENGINE</span>
-                  <span className="text-emerald-400">CITATIONS VERIFIED AGAINST 20-F / Q4 TRANSCRIPT</span>
+                <div className="pt-3 border-t border-[#EDF2FB] flex flex-wrap items-center justify-between gap-2 app-meta">
+                  <span>Report Agent • multi-agent synthesis</span>
+                  <span className="inline-flex items-center gap-1.5 text-[#1D7A5F] font-semibold">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Citations verified against source filings
+                  </span>
                 </div>
               </div>
-            </Card>
+            </article>
           ) : (
-            <Card title="No Report Selected">
-              <p className="text-xs text-slate-400">Select a report from the list to inspect.</p>
-            </Card>
+            <article className="dash-card dash-reveal">
+              <CardHead title="Report viewer" subtitle="Select a report to inspect" />
+              <div className="p-4">
+                <Empty
+                  Icon={FileCheck}
+                  title="No report selected"
+                  description="Choose a report from the list, or generate a new analyst report to get started."
+                  actionLabel="Generate Report"
+                  onAction={() => setShowCreateModal(true)}
+                />
+              </div>
+            </article>
           )}
         </div>
-      </div>
+      </section>
 
-      {/* Generate Report Modal */}
-      <Modal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        title="Generate Automated Analyst Report"
-      >
-        <form onSubmit={handleCreateReport} className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Report Title</label>
-            <input
-              type="text"
-              value={titleInput}
-              onChange={(e) => setTitleInput(e.target.value)}
-              placeholder="e.g. FY24 Comprehensive Equity Research Note"
-              className="w-full glass-inset text-slate-200 text-xs rounded-lg py-2.5 px-3 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15"
-              required
-            />
-          </div>
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-[#0F172A]/25 backdrop-blur-sm">
+          <form onSubmit={handleCreateReport} className="dash-card w-full max-w-md p-6 space-y-4">
+            <div>
+              <h3 className="dash-card-title">Generate analyst report</h3>
+              <p className="dash-card-sub">The Report Agent synthesises indexed filings into a cited note.</p>
+            </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Company Name</label>
-            <input
-              type="text"
-              value={companyInput}
-              onChange={(e) => setCompanyInput(e.target.value)}
-              className="w-full glass-inset text-slate-200 text-xs rounded-lg py-2.5 px-3 focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-500/15"
-            />
-          </div>
+            <div>
+              <label className="app-label">Report title</label>
+              <input
+                className="app-field"
+                value={titleInput}
+                onChange={(e) => setTitleInput(e.target.value)}
+                placeholder="e.g. FY24 Comprehensive Equity Research Note"
+                required
+              />
+            </div>
 
-          <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-xs text-emerald-400 space-y-1">
-            <p className="font-semibold">Automated Report Agent Workflow:</p>
-            <p className="text-slate-300 text-[11px]">
-              1. Summarize executive performance across indexed filings.<br />
-              2. Extract operating KPIs & year-over-year deltas.<br />
-              3. Highlight automated red flags & auditor status.<br />
-              4. Generate structured markdown export.
-            </p>
-          </div>
+            <div>
+              <label className="app-label">Company name</label>
+              <input className="app-field" value={companyInput} onChange={(e) => setCompanyInput(e.target.value)} />
+            </div>
 
-          <div className="flex justify-end gap-3 pt-2">
-            <Button variant="ghost" size="sm" onClick={() => setShowCreateModal(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" size="sm" type="submit" loading={generating}>
-              Synthesize Report
-            </Button>
-          </div>
-        </form>
-      </Modal>
-    </div>
+            <div className="app-block">
+              <p className="text-[12.5px] font-semibold text-slate-700 mb-1">Report agent workflow</p>
+              <p className="app-meta leading-relaxed">
+                1. Summarize executive performance across indexed filings.
+                <br />
+                2. Extract operating KPIs and year-over-year deltas.
+                <br />
+                3. Highlight automated red flags and auditor status.
+                <br />
+                4. Generate a structured markdown export.
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-2.5 pt-1">
+              <button type="button" className="dash-btn dash-btn-ghost" onClick={() => setShowCreateModal(false)}>
+                Cancel
+              </button>
+              <button type="submit" className="dash-btn dash-btn-primary" disabled={generating}>
+                {generating ? 'Synthesizing…' : 'Synthesize report'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </main>
   );
 };

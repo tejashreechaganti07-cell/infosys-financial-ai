@@ -14,14 +14,7 @@ def get_extraction_task(agent, document_text: str):
         output_pydantic=FinancialMetricsOutput
     )
 
-def get_red_flag_task(agent, context_tasks: list):
-    return Task(
-        description="Analyze the extracted financial metrics and underlying document context to identify any red flags, risks, or anomalies (e.g., declining margins, unusual debt increases). Provide a citation for each red flag.",
-        expected_output="A structured list of identified red flags and risks.",
-        agent=agent,
-        context=context_tasks,
-        output_pydantic=RedFlagsOutput
-    )
+
 
 def get_comparison_task(agent, context_tasks: list, historical_data: str = None):
     historical_prompt = f" Historical context/Peers: {historical_data}" if historical_data else ""

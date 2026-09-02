@@ -83,74 +83,31 @@ def retrieve_financial_document_chunks(
     """
     Retrieve financial document chunks from MongoDB for a specific
     financial metric.
-
-    The tool returns the document chunks that the Extraction Agent
-    should use as evidence.
     """
-
-    import asyncio
-
-    async def _retrieve():
-
-        db = get_db()
-
-        collection = db[COLLECTION_CHUNKS]
-
-        cursor = (
-            collection.find(
-                {
-                    "document_id": document_id
-                }
-            )
-            .limit(MAX_CHUNKS)
-        )
-
-        chunks = await cursor.to_list(
-            length=MAX_CHUNKS
-        )
-
-        result = []
-
-        for chunk in chunks:
-
-            result.append(
-                {
-                    "chunk_id": chunk.get("chunk_id"),
-                    "page_number": chunk.get(
-                        "page_start",
-                        chunk.get("page_number")
-                    ),
-                    "section_type": chunk.get(
-                        "section_type",
-                        "unknown"
-                    ),
-                    "text": chunk.get(
-                        "text",
-                        ""
-                    )
-                }
-            )
-
-        return json.dumps(result)
+    from pymongo import MongoClient
+    from app.core.config import settings
 
     try:
+        client = MongoClient(settings.MONGODB_URI)
+        db = client[settings.DATABASE_NAME]
+        collection = db[COLLECTION_CHUNKS]
 
-        return asyncio.run(
-            _retrieve()
-        )
+        chunks = list(collection.find({"document_id": document_id}).limit(MAX_CHUNKS))
+        
+        result = []
+        for chunk in chunks:
+            result.append({
+                "chunk_id": chunk.get("chunk_id"),
+                "page_number": chunk.get("page_start", chunk.get("page_number")),
+                "section_type": chunk.get("section_type", "unknown"),
+                "text": chunk.get("text", "")
+            })
 
+        client.close()
+        return json.dumps(result)
     except Exception as e:
-
-        logger.error(
-            "Chunk retrieval failed: %s",
-            e
-        )
-
-        return json.dumps(
-            {
-                "error": str(e)
-            }
-        )
+        logger.error(f"Chunk retrieval failed: {e}")
+        return json.dumps({"error": str(e)})
 
 
 # ============================================================
@@ -166,96 +123,45 @@ def store_extracted_financial_metrics(
     """
     Store validated financial metrics in MongoDB.
     """
+    from pymongo import MongoClient
+    from app.core.config import settings
 
-    import asyncio
-
-    async def _store():
-
-        db = get_db()
-
+    try:
+        client = MongoClient(settings.MONGODB_URI)
+        db = client[settings.DATABASE_NAME]
         collection = db[COLLECTION_EXTRACTED]
 
-        parsed = json.loads(
-            extraction_json
-        )
-
-        metrics = parsed.get(
-            "metrics",
-            []
-        )
+        parsed = json.loads(extraction_json)
+        metrics = parsed.get("metrics", [])
 
         documents = []
-
         for metric in metrics:
-
             if metric.get("value") is None:
                 continue
 
-            documents.append(
-                {
-                    "document_id": document_id,
-                    "company_name": company_name,
-                    "metric_name": metric.get(
-                        "metric_name"
-                    ),
-                    "value": metric.get(
-                        "value"
-                    ),
-                    "original_value": metric.get(
-                        "original_value"
-                    ),
-                    "currency": metric.get(
-                        "currency"
-                    ),
-                    "unit": metric.get(
-                        "unit"
-                    ),
-                    "fiscal_year": metric.get(
-                        "fiscal_year"
-                    ),
-                    "source_chunk_ids": metric.get(
-                        "source_chunk_ids",
-                        []
-                    ),
-                    "source_pages": metric.get(
-                        "source_pages",
-                        []
-                    ),
-                    "confidence": metric.get(
-                        "confidence",
-                        0
-                    ),
-                    "source_type": "extracted"
-                }
-            )
+            documents.append({
+                "document_id": document_id,
+                "company_name": company_name,
+                "metric_name": metric.get("metric_name"),
+                "value": metric.get("value"),
+                "original_value": metric.get("original_value"),
+                "currency": metric.get("currency"),
+                "unit": metric.get("unit"),
+                "fiscal_year": metric.get("fiscal_year"),
+                "source_chunk_ids": metric.get("source_chunk_ids", []),
+                "source_pages": metric.get("source_pages", []),
+                "confidence": metric.get("confidence", 0),
+                "source_type": "extracted"
+            })
 
         if documents:
+            collection.insert_many(documents)
 
-            await collection.insert_many(
-                documents
-            )
-
-        return (
-            f"Stored {len(documents)} "
-            f"financial metrics."
-        )
-
-    try:
-
-        return asyncio.run(
-            _store()
-        )
-
+        client.close()
+        return f"Stored {len(documents)} financial metrics."
     except Exception as e:
-
-        logger.error(
-            "Metric storage failed: %s",
-            e
-        )
-
-        return (
-            f"Storage failed: {str(e)}"
-        )
+        logger.error(f"Metric storage failed: {e}")
+        return f"Storage failed: {str(e)}"
 
 
 # ============================================================

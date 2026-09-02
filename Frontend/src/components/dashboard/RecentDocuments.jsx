@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
+import { EmptyState } from '../common/EmptyState';
 import { FileText, CheckCircle2, Calendar, Database } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -16,9 +17,19 @@ export const RecentDocuments = ({ documents = [] }) => {
       }
     >
       {documents.length === 0 ? (
-        <div className="py-8 text-center text-slate-500 text-xs">
-          No filings indexed yet. Upload a document in Research Workspace.
-        </div>
+        <EmptyState
+          icon={Database}
+          title="No filings indexed"
+          description="Upload an annual report, 10-K or 20-F in the Research Workspace. The Document Agent parses, chunks and embeds it for retrieval."
+          action={
+            <Link
+              to="/workspace"
+              className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg text-xs font-semibold text-white bg-brand-600 hover:bg-brand-500 transition-colors"
+            >
+              Upload a filing
+            </Link>
+          }
+        />
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">

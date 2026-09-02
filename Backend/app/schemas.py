@@ -105,10 +105,11 @@ class FinancialMetricSchema(BaseModel):
     status: str  # "Positive" | "Neutral" | "Negative"
 
 class RedFlagSchema(BaseModel):
-    severity: str  # "High" | "Medium" | "Low" | "Info"
-    title: str
-    description: str
-    citation: str
+    risk_type: str
+    severity: str  # "High" | "Medium" | "Low"
+    affected_metrics: List[str]
+    explanation: str
+    citations: List[str]
 
 class ComparisonItemSchema(BaseModel):
     company: str

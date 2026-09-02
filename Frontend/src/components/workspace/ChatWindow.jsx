@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Bot, User, Sparkles, CheckCircle2, ChevronDown, ChevronUp, FileText, Quote } from 'lucide-react';
-import { chatService } from '../../api';
+import { chatService } from '../../services/chatService';
 import { Badge } from '../common/Badge';
 
 export const ChatWindow = ({ workspaceId }) => {

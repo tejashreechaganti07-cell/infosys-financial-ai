@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Upload, FileText, CheckCircle, AlertCircle, X } from 'lucide-react';
 import { Button } from '../common/Button';
 import { Input } from '../common/Input';
-import { documentService } from '../../api';
+import { documentService } from '../../services/documentService';
 
 export const UploadPanel = ({ workspaceId, onUploadSuccess }) => {
   const [dragActive, setDragActive] = useState(false);
