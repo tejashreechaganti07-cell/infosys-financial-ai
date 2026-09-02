@@ -13,7 +13,6 @@ from app.core.database import get_db, DatabaseManager as db_manager
 async def test():
     # Connect to database first
     await db_manager.connect_db()
-    
     db = get_db()
     
     # Automatically find a document that was already uploaded

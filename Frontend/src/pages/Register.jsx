@@ -1,10 +1,41 @@
-import { ThemeToggle } from '../components/common/ThemeToggle';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { Button } from '../components/common/Button';
-import { Input } from '../components/common/Input';
-import { Mail, Lock, User, TrendingUp } from 'lucide-react';
+import { AuthShell } from '../components/common/AuthShell';
+import {
+  Mail,
+  Lock,
+  User,
+  Briefcase,
+  Workflow,
+  Brain,
+  Link2,
+  LineChart,
+  FileText,
+  AlertTriangle,
+} from 'lucide-react';
+import './auth.css';
+
+const HIGHLIGHTS = [
+  {
+    num: '01',
+    icon: Workflow,
+    title: 'One Research Workspace',
+    desc: 'Organize company research, filings and agent conversations in one place.',
+  },
+  {
+    num: '02',
+    icon: Brain,
+    title: 'Intelligent Analysis',
+    desc: 'Let specialized agents investigate financial signals and risks.',
+  },
+  {
+    num: '03',
+    icon: Link2,
+    title: 'Grounded Results',
+    desc: 'Trace important answers back to their original source.',
+  },
+];
 
 export const Register = () => {
   const [fullName, setFullName] = useState('');
@@ -24,118 +55,190 @@ export const Register = () => {
       await register(email, password, fullName, role);
       navigate('/dashboard');
     } catch (err) {
-      const detail = err.response?.data?.detail;
-      let errMsg = 'Registration failed. Please check your details.';
-      if (typeof detail === 'string') {
-        errMsg = detail;
-      } else if (Array.isArray(detail)) {
-        errMsg = detail.map(d => d.msg).join(', ') || errMsg;
-      }
-      setError(errMsg);
+      setError(err.response?.data?.detail || 'Registration failed. Please check your details.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-5 py-12 overflow-hidden">
-      <div className="absolute top-5 right-5 z-50">
-        <ThemeToggle />
-      </div>
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-grid opacity-30" />
-        <div className="orb top-[-12%] right-[18%] h-[440px] w-[440px] bg-accent-600/22 animate-float" />
-        <div className="orb bottom-[-14%] left-[12%] h-[400px] w-[400px] bg-brand-600/22" />
-      </div>
+    <AuthShell>
+      <div className="auth-stage">
+        <section className="auth-hero">
+          <span className="auth-chip c1" aria-hidden="true">
+            <span className="chip-icon">
+              <LineChart className="w-[14px] h-[14px]" />
+            </span>
+            <span>
+              <span className="auth-chip-label">Revenue growth</span>
+              <span className="auth-chip-value" style={{ display: 'block' }}>+18.6%</span>
+            </span>
+          </span>
+          <span className="auth-chip c2" aria-hidden="true">
+            <span className="chip-icon">
+              <FileText className="w-[14px] h-[14px]" />
+            </span>
+            <span>
+              <span className="auth-chip-label">Filings analyzed</span>
+              <span className="auth-chip-value" style={{ display: 'block' }}>24,568</span>
+            </span>
+          </span>
+          <span className="auth-chip c3" aria-hidden="true">
+            <span className="chip-icon">
+              <AlertTriangle className="w-[14px] h-[14px]" />
+            </span>
+            <span>
+              <span className="auth-chip-label">Risk signals</span>
+              <span className="auth-chip-value" style={{ display: 'block' }}>312</span>
+            </span>
+          </span>
 
-      <div className="w-full max-w-md animate-fadeUp">
-        <div className="flex flex-col items-center text-center mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-accent-600 flex items-center justify-center text-white shadow-[0_14px_34px_-16px_rgba(99,102,241,0.95)]">
-            <TrendingUp className="w-6 h-6" />
+          <span className="auth-eyebrow auth-reveal d1">
+            <span className="dot" />
+            Analyst workspace onboarding
+          </span>
+
+          <h1 className="auth-title auth-reveal d2">
+            Build your
+            <br />
+            <span className="accent">research workspace.</span>
+          </h1>
+
+          <p className="auth-lede auth-reveal d3">
+            Bring filings, financial intelligence and multi-agent analysis together in one grounded
+            research environment.
+          </p>
+
+          <div className="auth-features">
+            {HIGHLIGHTS.map(({ num, icon: Icon, title, desc }, i) => (
+              <div key={num} className={`auth-feature auth-reveal d${i + 3}`}>
+                <span className="auth-feature-icon">
+                  <Icon className="w-[20px] h-[20px]" />
+                </span>
+                <div>
+                  <span className="auth-feature-num">{num}</span>
+                  <p className="auth-feature-title">{title}</p>
+                  <p className="auth-feature-desc">{desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
-          <h1 className="mt-5 text-2xl font-bold text-slate-50">Create analyst account</h1>
-          <p className="mt-1.5 text-sm text-slate-400">
-            Join the multi-agent financial research platform.
-          </p>
-        </div>
+        </section>
 
-        <div className="glass-solid rounded-3xl p-7 sm:p-9">
-          {error && (
-            <div
-              role="alert"
-              className="mb-5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-200 px-4 py-3 text-xs leading-relaxed"
-            >
-              {error}
-            </div>
-          )}
+        <main className="auth-panel">
+          <div className="auth-card">
+            <h1 className="auth-card-title">Create your analyst account</h1>
+            <p className="auth-card-sub">Start building your financial research workspace.</p>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <Input
-              id="fullName"
-              label="Full Name"
-              type="text"
-              required
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Your full name"
-              icon={User}
-            />
+            {error && (
+              <div role="alert" className="auth-error">
+                {error}
+              </div>
+            )}
 
-            <Input
-              id="email"
-              label="Email address"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="analyst@infosys.com"
-              icon={Mail}
-            />
+            <form className="auth-form" onSubmit={handleSubmit}>
+              <div>
+                <label htmlFor="fullName" className="auth-field-label">
+                  Full name
+                </label>
+                <div className="auth-input-wrap">
+                  <User />
+                  <input
+                    id="fullName"
+                    className="auth-input"
+                    type="text"
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Your full name"
+                    autoComplete="name"
+                  />
+                </div>
+              </div>
 
-            <Input
-              id="password"
-              label="Password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              icon={Lock}
-            />
+              <div>
+                <label htmlFor="email" className="auth-field-label">
+                  Email address
+                </label>
+                <div className="auth-input-wrap">
+                  <Mail />
+                  <input
+                    id="email"
+                    className="auth-input"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="analyst@infosys.com"
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
 
-            <div>
-              <label htmlFor="role" className="label">
-                Professional Role
-              </label>
-              <select
-                id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="field h-11 px-3.5"
+              <div>
+                <label htmlFor="password" className="auth-field-label">
+                  Password
+                </label>
+                <div className="auth-input-wrap">
+                  <Lock />
+                  <input
+                    id="password"
+                    className="auth-input"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                  />
+                </div>
+                <p className="auth-hint">
+                  Use at least 8 characters with a mix of letters and numbers.
+                </p>
+              </div>
+
+              <div>
+                <label htmlFor="role" className="auth-field-label">
+                  Professional role
+                </label>
+                <div className="auth-input-wrap">
+                  <Briefcase />
+                  <select
+                    id="role"
+                    className="auth-input"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                  >
+                    <option value="Senior Financial Analyst">Senior Financial Analyst</option>
+                    <option value="Investment Banking Analyst">Investment Banking Analyst</option>
+                    <option value="Equity Research Associate">Equity Research Associate</option>
+                    <option value="Portfolio Manager">Portfolio Manager</option>
+                    <option value="Finance Student / Intern">Finance Student / Intern</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="auth-submit"
+                disabled={loading}
+                aria-busy={loading || undefined}
               >
-                <option value="Senior Financial Analyst">Senior Financial Analyst</option>
-                <option value="Investment Banking Analyst">Investment Banking Analyst</option>
-                <option value="Equity Research Associate">Equity Research Associate</option>
-                <option value="Portfolio Manager">Portfolio Manager</option>
-                <option value="Finance Student / Intern">Finance Student / Intern</option>
-              </select>
-            </div>
+                {loading && <span className="auth-spin" />}
+                Create analyst account
+              </button>
+            </form>
 
-            <div className="pt-2">
-              <Button type="submit" variant="primary" size="lg" className="w-full" loading={loading}>
-                Register &amp; enter workspace
-              </Button>
-            </div>
-          </form>
+            <p className="auth-foot">
+              Already have an account? <Link to="/login">Sign in</Link>
+            </p>
 
-          <p className="mt-7 text-center text-xs text-slate-400">
-            Already have an account?{' '}
-            <Link to="/login" className="font-semibold text-brand-300 hover:text-brand-200 transition-colors">
-              Sign in
-            </Link>
-          </p>
-        </div>
+            <p className="auth-legal">
+              Secure analyst access · Source-grounded financial intelligence
+            </p>
+          </div>
+        </main>
       </div>
-    </div>
+    </AuthShell>
   );
 };

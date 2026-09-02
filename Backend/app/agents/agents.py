@@ -10,14 +10,7 @@ def get_extraction_agent():
         verbose=True
     )
 
-def get_red_flag_agent():
-    return Agent(
-        role="Risk & Compliance Analyst",
-        goal="Identify potential red flags, anomalies, and risks from the financial context.",
-        backstory="You specialize in identifying hidden risks in corporate filings. You look for discretionary demand softness, auditor qualifications, unusual accounting practices, and legal liabilities. Your eagle eye spots what others miss.",
-        allow_delegation=False,
-        verbose=True
-    )
+
 
 def get_comparison_agent():
     return Agent(

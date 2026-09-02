@@ -1,18 +1,17 @@
 from crewai import Crew, Process
 from app.agents.agents import (
     get_extraction_agent,
-    get_red_flag_agent,
     get_comparison_agent,
     get_research_agent,
     get_report_agent
 )
 from app.agents.tasks import (
     get_extraction_task,
-    get_red_flag_task,
     get_comparison_task,
     get_research_task,
     get_report_task
 )
+from app.agents.red_flag_agent import get_red_flag_agent, get_red_flag_task
 from app.schemas import ReportSectionsSchema
 import json
 
@@ -35,7 +34,9 @@ class FinancialCrewRunner:
         
         red_flag_task = get_red_flag_task(
             red_flag_agent, 
-            context_tasks=[extraction_task]
+            context_tasks=[extraction_task],
+            document_id=workspace_id,
+            company_name=company_name
         )
         
         comparison_task = get_comparison_task(

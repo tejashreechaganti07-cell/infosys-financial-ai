@@ -1,123 +1,176 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { Card } from '../components/common/Card';
-import { Badge } from '../components/common/Badge';
-import { Button } from '../components/common/Button';
-import { User, Shield, Key, Cpu, ExternalLink, RefreshCw, Database } from 'lucide-react';
+import { PageHead, CardHead } from '../components/app/ui';
+import { User, Shield, Key, Cpu, RefreshCw, Database, LogOut, Bell, Mail } from 'lucide-react';
+import './dashboard.css';
+import './app-pages.css';
 
 export const Profile = () => {
   const { user, logout } = useAuth();
+  const [prefs, setPrefs] = useState({ digest: true, riskAlerts: true, reportReady: false });
 
   const handleResetDemo = () => {
-    if (window.confirm("Reset active session and reload demo credentials?")) {
+    if (window.confirm('Reset active session and reload demo credentials?')) {
       localStorage.clear();
       window.location.href = '/login';
     }
   };
 
+  const name = user?.full_name || 'Demo Analyst';
+  const initial = name.charAt(0).toUpperCase();
+
+  const toggle = (key) => setPrefs((p) => ({ ...p, [key]: !p[key] }));
+
   return (
-    <div className="space-y-6 max-w-4xl mx-auto animate-fadeIn">
-      {/* Top Banner */}
-      <div className="pb-4 border-b border-white/[0.07]">
-        <h2 className="text-xl font-bold text-slate-100 tracking-tight flex items-center gap-2">
-          <span>Analyst Profile & System Configuration</span>
-          <Badge variant="emerald">ACTIVE USER SESSION</Badge>
-        </h2>
-        <p className="text-xs text-slate-400 mt-1">
-          Infosys Internship • Multi-Agent Financial Research Platform (FastAPI + React + MongoDB)
-        </p>
-      </div>
+    <main className="dash-body">
+      <PageHead
+        eyebrow="Account"
+        title="Profile & Settings"
+        subtitle="Manage your analyst profile, workspace preferences and session."
+        actions={
+          <button type="button" className="dash-btn dash-btn-ghost" onClick={handleResetDemo}>
+            <RefreshCw className="w-4 h-4" />
+            Reset session
+          </button>
+        }
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* User Card */}
-        <Card title="User Account Details" subtitle="Authentication & Role Permissions">
-          <div className="space-y-4 text-xs">
-            <div className="flex items-center gap-3 p-3 rounded-xl glass-inset">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white font-bold text-base">
-                {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'A'}
-              </div>
-              <div>
-                <h4 className="font-bold text-slate-100 text-sm">{user?.full_name || 'Tejashree Chaganti'}</h4>
-                <p className="text-slate-400">{user?.email || 'demo@infosys.com'}</p>
-                <div className="mt-1 flex items-center gap-1.5">
-                  <Badge variant="emerald">{user?.role || 'Senior Financial Analyst'}</Badge>
-                </div>
-              </div>
+      <section className="dash-card dash-reveal p-6 flex flex-col sm:flex-row sm:items-center gap-5">
+        <span className="app-avatar-lg">{initial}</span>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-[20px] font-bold text-slate-900 tracking-tight truncate">{name}</h2>
+          <p className="app-meta truncate">{user?.email || 'analyst@infosys.ai'}</p>
+          <div className="mt-2.5 flex flex-wrap gap-2">
+            <span className="dash-badge badge-info">{user?.role || 'Analyst'}</span>
+            <span className="dash-badge badge-ok">Session active</span>
+          </div>
+        </div>
+        <button
+          type="button"
+          className="dash-btn dash-btn-ghost shrink-0"
+          onClick={() => {
+            logout();
+            window.location.href = '/login';
+          }}
+        >
+          <LogOut className="w-4 h-4" />
+          Sign out
+        </button>
+      </section>
+
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <article className="dash-card dash-reveal">
+          <CardHead title="Account Details" subtitle="Identity used across research sessions" />
+          <div className="p-4">
+            <div className="app-kv">
+              <span>
+                <User className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
+                Full name
+              </span>
+              <span>{name}</span>
             </div>
-
-            <div className="space-y-2 pt-2">
-              <div className="flex items-center justify-between text-slate-400">
-                <span>Organization:</span>
-                <span className="font-semibold text-slate-200">Infosys Limited</span>
-              </div>
-              <div className="flex items-center justify-between text-slate-400">
-                <span>Access Scope:</span>
-                <span className="font-mono text-emerald-400">FULL WORKSPACE + REPORTS</span>
-              </div>
-              <div className="flex items-center justify-between text-slate-400">
-                <span>Session Expiration:</span>
-                <span className="font-mono text-slate-300">24 HOURS (JWT)</span>
-              </div>
+            <div className="app-kv">
+              <span>
+                <Mail className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
+                Email
+              </span>
+              <span>{user?.email || 'analyst@infosys.ai'}</span>
             </div>
-
-            <div className="pt-4 border-t border-white/10 flex justify-end">
-              <Button variant="danger" size="sm" onClick={logout}>
-                Sign Out of Terminal
-              </Button>
+            <div className="app-kv">
+              <span>
+                <Shield className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
+                Role
+              </span>
+              <span>{user?.role || 'Analyst'}</span>
+            </div>
+            <div className="app-kv">
+              <span>
+                <Key className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
+                Account ID
+              </span>
+              <span className="truncate max-w-[200px]">{user?.id || '—'}</span>
             </div>
           </div>
-        </Card>
+        </article>
 
-        {/* Project & API Card */}
-        <Card title="Project & API Reference" subtitle="FastAPI REST API & Motor Driver">
-          <div className="space-y-4 text-xs">
-            <div className="p-3.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-emerald-400">FastAPI Swagger UI</span>
-                <Badge variant="emerald">READY</Badge>
+        <article className="dash-card dash-reveal">
+          <CardHead title="Notification Preferences" subtitle="Control what the agents alert you about" />
+          <div className="p-4">
+            {[
+              { key: 'digest', label: 'Daily research digest', desc: 'Summary of new filings and insights' },
+              { key: 'riskAlerts', label: 'Risk signal alerts', desc: 'Notify when the Risk Agent flags an issue' },
+              { key: 'reportReady', label: 'Report ready alerts', desc: 'Notify when a report finishes generating' },
+            ].map((row) => (
+              <div key={row.key} className="app-setting">
+                <span className="min-w-0">
+                  <span className="block text-[13.5px] font-semibold text-slate-700">{row.label}</span>
+                  <span className="block app-meta">{row.desc}</span>
+                </span>
+                <button
+                  type="button"
+                  aria-pressed={prefs[row.key]}
+                  onClick={() => toggle(row.key)}
+                  className={`app-toggle ${prefs[row.key] ? 'is-on' : ''}`}
+                />
               </div>
-              <p className="text-slate-300 leading-relaxed">
-                Live interactive Swagger API documentation is running on port 8000.
-              </p>
-              <a
-                href="http://localhost:8000/docs"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-semibold pt-1"
+            ))}
+          </div>
+        </article>
+
+        <article className="dash-card dash-reveal">
+          <CardHead title="Research Engine" subtitle="Multi-agent stack powering your workspace" />
+          <div className="p-4">
+            <div className="app-kv">
+              <span>
+                <Cpu className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
+                Agent pipeline
+              </span>
+              <span>5 agents active</span>
+            </div>
+            <div className="app-kv">
+              <span>
+                <Database className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
+                Vector index
+              </span>
+              <span>Connected</span>
+            </div>
+            <div className="app-kv">
+              <span>
+                <Bell className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
+                Grounded citations
+              </span>
+              <span>Enabled</span>
+            </div>
+          </div>
+        </article>
+
+        <article className="dash-card dash-reveal">
+          <CardHead title="Session & Security" subtitle="Manage local session data" />
+          <div className="p-4 space-y-3">
+            <p className="text-[13.5px] text-slate-600 leading-relaxed">
+              Resetting clears local session data and returns you to the sign-in screen. Your indexed filings and
+              reports remain untouched.
+            </p>
+            <div className="flex flex-wrap gap-2.5">
+              <button type="button" className="dash-btn dash-btn-ghost" onClick={handleResetDemo}>
+                <RefreshCw className="w-4 h-4" />
+                Reset session
+              </button>
+              <button
+                type="button"
+                className="dash-btn dash-btn-primary"
+                onClick={() => {
+                  logout();
+                  window.location.href = '/login';
+                }}
               >
-                <span>Open http://localhost:8000/docs</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </div>
-
-            <div className="space-y-2 text-slate-400">
-              <div className="flex items-center justify-between">
-                <span>Backend Framework:</span>
-                <span className="font-mono text-slate-200">FastAPI (Python 3.12)</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Database Engine:</span>
-                <span className="font-mono text-emerald-400">MongoDB / Motor Async</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Frontend Build:</span>
-                <span className="font-mono text-slate-200">React + Vite + Tailwind CSS</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Hallucination Prevention:</span>
-                <span className="font-mono text-cyan-400">STRICT SOURCE CITATIONS</span>
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-white/10 flex justify-end">
-              <Button variant="secondary" size="sm" onClick={handleResetDemo}>
-                <RefreshCw className="w-4 h-4 mr-1.5" />
-                Reset Demo Session
-              </Button>
+                <LogOut className="w-4 h-4" />
+                Sign out
+              </button>
             </div>
           </div>
-        </Card>
-      </div>
-    </div>
+        </article>
+      </section>
+    </main>
   );
 };

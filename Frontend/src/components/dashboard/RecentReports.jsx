@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
+import { EmptyState } from '../common/EmptyState';
 import { FileCheck, Download, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -16,9 +17,19 @@ export const RecentReports = ({ reports = [] }) => {
       }
     >
       {reports.length === 0 ? (
-        <div className="py-8 text-center text-slate-500 text-xs">
-          No analyst reports generated yet.
-        </div>
+        <EmptyState
+          icon={FileCheck}
+          title="No analyst reports yet"
+          description="Generated reports include an executive summary, extracted metrics, red flags and peer ratios — each cited to its source filing."
+          action={
+            <Link
+              to="/reports"
+              className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg text-xs font-semibold text-white bg-brand-600 hover:bg-brand-500 transition-colors"
+            >
+              Go to reports <ExternalLink className="w-3.5 h-3.5" />
+            </Link>
+          }
+        />
       ) : (
         <div className="space-y-3">
           {reports.map((rep) => (
