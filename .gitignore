@@ -2,6 +2,7 @@
 venv/
 .venv/
 env/
+.env
 ENV/
 __pycache__/
 *.py[cod]
@@ -28,3 +29,10 @@ coverage/
 *.sqlite3
 *.db
 *.sqlite
+.vscode/
+Backend/.env
+# Project-specific generated files
+Backend/.venv/
+Frontend/node_modules/
+Frontend/dist/
+Frontend/build/
