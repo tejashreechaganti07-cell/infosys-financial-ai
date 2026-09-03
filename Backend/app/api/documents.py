@@ -1,13 +1,17 @@
 # MARK: Imports
 import uuid
 import os
+import logging
 import aiofiles
 from datetime import datetime, timezone
 from typing import Optional
-from fastapi import APIRouter, Depends, UploadFile, File, Form, status, Query, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, UploadFile, File, Form, status, Query, HTTPException
 from app.schemas import DocumentResponse, DocumentListResponse
 from app.core.database import get_db
 from app.core.security import get_current_user_token
+from app.agents.document_agent import DocumentProcessor
+
+logger = logging.getLogger(__name__)
 
 # MARK: Constants
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
@@ -17,8 +21,32 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 router = APIRouter(prefix="/documents", tags=["Financial Documents"])
 
 # MARK: Endpoints
+async def _run_document_processor(doc_id: str, file_path: str):
+    """Background task: runs the full PDF parsing → chunking → embedding → MongoDB pipeline.
+    Updates the document status to INDEXED on success or FAILED on error.
+    """
+    db = get_db()
+    docs_col = db["documents"]
+    try:
+        logger.info(f"[BG] Starting DocumentProcessor for {doc_id}")
+        result = await DocumentProcessor.process_document(doc_id, file_path)
+        chunks_count = result.get("chunks_extracted", 0) + result.get("tables_extracted", 0)
+        await docs_col.update_one(
+            {"_id": doc_id},
+            {"$set": {"status": "INDEXED", "chunks_count": chunks_count}}
+        )
+        logger.info(f"[BG] Document {doc_id} indexed successfully — {chunks_count} chunks stored.")
+    except Exception as e:
+        logger.error(f"[BG] DocumentProcessor failed for {doc_id}: {e}")
+        await docs_col.update_one(
+            {"_id": doc_id},
+            {"$set": {"status": "FAILED"}}
+        )
+
+
 @router.post("/upload", response_model=DocumentResponse, status_code=status.HTTP_201_CREATED)
 async def upload_document(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     workspace_id: str = Form(...),
     company_name: str = Form("Infosys Limited"),
@@ -47,8 +75,6 @@ async def upload_document(
     async with aiofiles.open(file_path, 'wb') as out_file:
         await out_file.write(content)
     
-    chunks_count = max(10, file_size // 2500)
-    
     doc = {
         "_id": doc_id,
         "title": file.filename,
@@ -59,9 +85,10 @@ async def upload_document(
         "user_id": user_id,
         "file_path": f"uploads/{file_filename}",
         "file_size": file_size,
-        "status": "INDEXED",
+        # Status starts as PROCESSING — background task will update it to INDEXED or FAILED
+        "status": "PROCESSING",
         "is_seed": False,
-        "chunks_count": chunks_count,
+        "chunks_count": 0,
         "uploaded_at": now_str
     }
     
@@ -71,6 +98,9 @@ async def upload_document(
         {"_id": workspace_id},
         {"$inc": {"documents_count": 1}, "$set": {"updated_at": now_str}}
     )
+
+    # Kick off the Document Agent pipeline in the background (non-blocking)
+    background_tasks.add_task(_run_document_processor, doc_id, file_path)
     
     return DocumentResponse(
         id=doc_id,

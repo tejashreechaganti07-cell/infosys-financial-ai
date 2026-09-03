@@ -19,8 +19,6 @@ COLLECTION_CHUNKS = "parsed_chunks"
 CHUNK_SIZE = 4000
 OVERLAP = 400
 
-client = AsyncOpenAI()  # Expects OPENAI_API_KEY in environment
-
 def chunk_text(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = OVERLAP):
     chunks = []
     if not text:
@@ -40,7 +38,8 @@ class DocumentProcessor:
     @staticmethod
     async def process_document(document_id: str, file_path: str):
         logger.info(f"Starting optimized document processing for {document_id}")
-        
+        client = AsyncOpenAI()
+
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"PDF file not found: {file_path}")
 
