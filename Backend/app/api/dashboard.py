@@ -24,7 +24,12 @@ async def get_dashboard_stats(token_data: dict = Depends(get_current_user_token)
     async for doc in docs_col.find({"user_id": user_id}):
         total_chunks += doc.get("chunks_count", 0)
     
-    red_flags_count = max(5, docs_count * 4)
+    red_flags_count = 0
+    async for rep in reports_col.find({"user_id": user_id}):
+        sections = rep.get("sections", {})
+        if sections and isinstance(sections, dict):
+            flags = sections.get("red_flags", [])
+            red_flags_count += len(flags)
     
     cards = [
         StatsCard(
@@ -77,7 +82,12 @@ async def get_dashboard_summary(token_data: dict = Depends(get_current_user_toke
     async for doc in docs_col.find({"user_id": user_id}):
         total_chunks += doc.get("chunks_count", 0)
     
-    red_flags_count = max(5, docs_count * 4)
+    red_flags_count = 0
+    async for rep in reports_col.find({"user_id": user_id}):
+        sections = rep.get("sections", {})
+        if sections and isinstance(sections, dict):
+            flags = sections.get("red_flags", [])
+            red_flags_count += len(flags)
     
     cards = [
         StatsCard(title="Active Research Workspaces", value=str(ws_count), change="+2 this month", trend="up", icon="FolderTree"),
