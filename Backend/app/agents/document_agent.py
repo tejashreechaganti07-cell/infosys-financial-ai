@@ -38,7 +38,10 @@ class DocumentProcessor:
     @staticmethod
     async def process_document(document_id: str, file_path: str):
         logger.info(f"Starting optimized document processing for {document_id}")
-        client = AsyncOpenAI()
+        client = AsyncOpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    base_url=os.getenv("OPENAI_API_BASE")
+)
 
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"PDF file not found: {file_path}")
@@ -111,7 +114,7 @@ class DocumentProcessor:
         
         async def embed_chunk(chunk):
             try:
-                res = await client.embeddings.create(input=chunk["text"], model="text-embedding-3-small")
+                res = await client.embeddings.create(input=chunk["text"], model="openai/text-embedding-3-small")
                 chunk["embedding"] = res.data[0].embedding
             except Exception as e:
                 logger.error(f"Embedding failed for chunk {chunk['chunk_id']}: {e}")
