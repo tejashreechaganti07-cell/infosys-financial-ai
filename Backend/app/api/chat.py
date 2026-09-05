@@ -1,7 +1,19 @@
 # MARK: Imports
 import uuid
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+
+from app.schemas import (
+    ChatQueryRequest,
+    ChatQueryResponse,
+    ChatHistoryResponse,
+    ChatMessageResponse,
+    Citation
+)
+
+from app.core.database import get_db
+from app.core.security import get_current_user_token
+from app.agents.crew_runner import FinancialCrewRunner
 from app.schemas import ChatQueryRequest, ChatQueryResponse, ChatHistoryResponse, ChatMessageResponse, Citation
 from app.core.database import get_db
 from app.core.security import get_current_user_token
@@ -28,62 +40,127 @@ async def query_chat(query_in: ChatQueryRequest, token_data: dict = Depends(get_
         "timestamp": now_str
     })
     
-    query_lower = query_in.query.lower()
-    if "margin" in query_lower or "operating" in query_lower or "ebit" in query_lower:
-        answer_text = (
-            "Based on the FY2024 Annual Report and Q4 Earnings Call Transcript, **Infosys Limited** delivered an "
-            "**operating margin (EBIT)** of **20.7%**, which represents a slight compression of 30 basis points compared "
-            "to **21.0% in FY2023**.\n\n"
-            "**Key margin drivers** included:\n"
-            "- **Tailwinds:** Subcontractor cost optimization under *Project Maximus*, bringing subcontractor spend down to 7.4% of revenue.\n"
-            "- **Headwinds:** Discretionary demand softness in North American BFS and wage increments.\n"
-            "Overall EBIT resilience was maintained through disciplined cost governance."
+        # ------------------------------------------------------------
+    # Run the actual Research Agent chatbot pipeline
+    # ------------------------------------------------------------
+
+    # Verify that the workspace belongs to the logged-in user
+    ws_col = db["workspaces"]
+    workspace = await ws_col.find_one({
+        "_id": query_in.workspace_id,
+        "user_id": user_id
+    })
+
+    if not workspace:
+        raise HTTPException(
+            status_code=404,
+            detail="Workspace not found"
         )
-        reasoning = [
-            "1. Document Agent retrieved 4 chunks from 'Infosys Limited FY2024 Annual Report.pdf' (Section: Consolidated Financial Highlights).",
-            "2. Extraction Agent verified EBIT of 20.7% ($3,842M on $18,562M revenue) vs 21.0% ($3,824M on $18,212M revenue) in FY2023.",
-            "3. Cross-referenced with Q4 Earnings Call Transcript regarding Project Maximus cost reduction initiatives.",
-            "4. Synthesized step-by-step response with exact page citations."
-        ]
-        citations = [
-            Citation(source="Infosys Limited FY2024 Annual Report.pdf", page="Page 42 - Operating Performance", quote="Operating margin for FY 2024 stood at 20.7% compared to 21.0% in FY 2023."),
-            Citation(source="Infosys FY24 Q4 Earnings Call Transcript.pdf", page="Page 12 - CFO Remarks", quote="Project Maximus delivered sustained margin expansion through subcontractor optimization.")
-        ]
-    elif "debt" in query_lower or "risk" in query_lower or "flag" in query_lower:
-        answer_text = (
-            "Our **Red Flag Agent** scanned the consolidated balance sheet and auditor's report for **Infosys Limited FY24** and found:\n\n"
-            "1. **Debt-to-Equity Ratio:** Remains extremely low at **0.07x** (vs 0.08x in FY23), indicating negligible leverage risk.\n"
-            "2. **Auditor Qualification:** No going-concern warnings or qualifications in the **Deloitte Haskins & Sells LLP** audit report.\n"
-            "3. **Client Concentration Risk:** Top 5 clients account for **13.4%** of total revenue, which is well-diversified."
+
+    # Get documents belonging to this workspace
+    docs_col = db["documents"]
+
+    documents = await docs_col.find({
+        "workspace_id": query_in.workspace_id,
+        "user_id": user_id,
+        "status": "INDEXED"
+    }).to_list(length=None)
+
+    if not documents:
+        raise HTTPException(
+            status_code=400,
+            detail="No indexed documents are available in this workspace."
         )
-        reasoning = [
-            "1. Scanned Consolidated Balance Sheet for long-term and short-term lease liabilities.",
-            "2. Analyzed Independent Auditor's Report (Deloitte Haskins & Sells LLP) for qualifications.",
-            "3. Extracted customer concentration disclosures from Note 2.22."
-        ]
-        citations = [
-            Citation(source="Infosys Limited FY2024 Annual Report.pdf", page="Page 182 - Independent Auditor Report", quote="We issue an unmodified audit opinion on the consolidated financial statements."),
-            Citation(source="Infosys Limited FY2024 Annual Report.pdf", page="Page 214 - Capital Structure", quote="Debt to Equity ratio stood at 0.07 as of March 31, 2024.")
-        ]
-    else:
-        answer_text = (
-            f"Regarding your query on **'{query_in.query}'**, our multi-agent pipeline analyzed the indexed documents "
-            "in this research workspace and verified the following grounded metrics:\n\n"
-            "- **FY24 Total Revenue:** **$18,562M** (+1.9% YoY in USD terms)\n"
-            "- **Total Contract Value (TCV):** **$17.7 Billion** in large deal wins, providing strong revenue visibility.\n"
-            "- **Free Cash Flow (FCF):** **$2,890M**, representing an **82% FCF-to-Net Profit conversion**.\n\n"
-            "All citations are grounded strictly in the official FY2024 filings with zero hallucination."
+
+    # Use the first indexed document for the research query.
+    # Multi-document support can be added later.
+    # Select an indexed document that actually has processed chunks
+    document = None
+
+    for doc in documents:
+        if doc.get("chunks_count", 0) > 0:
+            document = doc
+            break
+
+    if not document:
+        raise HTTPException(
+            status_code=400,
+            detail="No indexed document with processed chunks is available in this workspace."
         )
-        reasoning = [
-            "1. Document Agent queried vector database for semantic match on query concepts.",
-            "2. Extraction Agent verified revenue ($18,562M), TCV ($17.7B), and FCF conversion (82%).",
-            "3. Research Agent compiled grounded response with strict source attribution."
-        ]
-        citations = [
-            Citation(source="Infosys Limited FY2024 Annual Report.pdf", page="Page 14 - Performance Highlights", quote="Revenues at $18,562 million; Large deal TCV at $17.7 billion for FY24."),
-            Citation(source="Infosys FY24 Q4 Earnings Call Transcript.pdf", page="Page 4 - CEO Opening Remarks", quote="We delivered strong free cash flow of $2.89 billion, up 16.5% YoY.")
-        ]
-        
+
+    document_id = document["_id"]
+    company_name = (
+        query_in.company_name
+        or document.get("company_name")
+        or "Unknown Company"
+    )
+
+    # Retrieve processed chunks generated by the Document Agent
+    chunks_col = db["parsed_chunks"]
+
+    chunks_cursor = chunks_col.find(
+        {"document_id": document_id}
+    ).sort("page_number", 1)
+
+    chunks = await chunks_cursor.to_list(length=None)
+
+    if not chunks:
+        raise HTTPException(
+            status_code=400,
+            detail="The selected document has not produced any processed chunks."
+        )
+
+    # Build the document context for the Research pipeline
+    document_parts = []
+
+    for chunk in chunks:
+        page_number = chunk.get(
+            "page_number",
+            chunk.get("page_start", "Unknown")
+        )
+
+        section = chunk.get(
+            "section_type",
+            "General"
+        )
+
+        text = chunk.get("text", "").strip()
+
+        if text:
+            document_parts.append(
+                f"[Page {page_number} | Section: {section}]\n{text}"
+            )
+
+    document_text = "\n\n".join(document_parts)
+
+    if not document_text:
+        raise HTTPException(
+            status_code=400,
+            detail="No usable text was found in the indexed document."
+        )
+
+    # Run:
+    # Extraction → Red Flag → Comparison → Research
+    answer_text = await FinancialCrewRunner.run_research(
+        document_id=document_id,
+        document_text=document_text,
+        query=query_in.query,
+        company_name=company_name
+    )
+
+    # The Research Agent currently returns textual analysis.
+    reasoning = [
+        "Document Agent provided the indexed financial document context.",
+        "Extraction Agent analyzed the financial metrics.",
+        "Red Flag Agent analyzed potential financial risks.",
+        "Comparison Agent evaluated financial performance.",
+        "Research Agent synthesized the findings to answer the user query."
+    ]
+
+    # Citations will be populated from structured source metadata
+    # once the Research Agent returns source-level citations.
+    citations = []
+
     assistant_msg = ChatMessageResponse(
         id=msg_id,
         workspace_id=query_in.workspace_id,

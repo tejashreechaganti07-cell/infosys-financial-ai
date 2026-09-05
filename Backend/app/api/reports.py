@@ -1,13 +1,15 @@
 # MARK: Imports
 import uuid
+import asyncio
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, status, Response, HTTPException
+from fastapi import APIRouter, Depends, status, Response, HTTPException, BackgroundTasks
 from app.schemas import (
     ReportCreate, ReportResponse, ReportListResponse, ReportSectionsSchema,
     FinancialMetricSchema, RedFlagSchema, ComparisonItemSchema
 )
 from app.core.database import get_db
 from app.core.security import get_current_user_token
+from app.agents.crew_runner import FinancialCrewRunner
 
 # MARK: Router Setup
 router = APIRouter(prefix="/reports", tags=["Analyst Reports"])
@@ -36,49 +38,59 @@ async def list_reports(token_data: dict = Depends(get_current_user_token)):
         ))
     return ReportListResponse(reports=items, total=len(items))
 
+async def run_report_generation_task(report_id: str, workspace_id: str, company_name: str, document_text: str):
+    db = get_db()
+    reports_col = db["reports"]
+    try:
+        result_sections = await asyncio.to_thread(
+            FinancialCrewRunner.run_pipeline,
+            workspace_id=workspace_id,
+            document_text=document_text,
+            query=None,
+            company_name=company_name
+        )
+        
+        await reports_col.update_one(
+            {"_id": report_id},
+            {
+                "$set": {
+                    "status": "COMPLETED",
+                    "sections": result_sections.model_dump(),
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+    except Exception as e:
+        await reports_col.update_one(
+            {"_id": report_id},
+            {
+                "$set": {
+                    "status": "FAILED",
+                    "error": str(e),
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+
 @router.post("", response_model=ReportResponse, status_code=status.HTTP_201_CREATED)
 @router.post("/", response_model=ReportResponse, status_code=status.HTTP_201_CREATED)
-async def create_report(report_in: ReportCreate, token_data: dict = Depends(get_current_user_token)):
+async def create_report(report_in: ReportCreate, background_tasks: BackgroundTasks, token_data: dict = Depends(get_current_user_token)):
     user_id = token_data.get("sub")
     db = get_db()
     reports_col = db["reports"]
+    docs_col = db["documents"]
+    
+    docs = docs_col.find({"workspace_id": report_in.workspace_id})
+    document_text_blocks = []
+    async for doc in docs:
+        document_text_blocks.append(f"Document: {doc.get('title', 'Unknown')} - Data available.")
+    
+    document_text = "\n".join(document_text_blocks)
+    if not document_text:
+        document_text = "No extensive document data found. Operating with limited context."
     
     rep_id = f"rep_{uuid.uuid4().hex[:12]}"
     now_str = datetime.now(timezone.utc).isoformat()
-    
-    sections = ReportSectionsSchema(
-        executive_summary=(
-            f"Multi-Agent Financial Research Report for **{report_in.company_name}**. Our Document, Extraction, and "
-            "Red Flag agents collaborated to parse filings in this workspace. Overall operational performance remains stable "
-            "with resilient cash flow generation and low balance sheet leverage."
-        ),
-        key_financials=[
-            FinancialMetricSchema(metric="Total Revenue (USD)", fy23="$18,212M", fy24="$18,562M", yoy_change="+1.9%", status="Positive"),
-            FinancialMetricSchema(metric="Operating Margin (EBIT)", fy23="21.0%", fy24="20.7%", yoy_change="-30 bps", status="Neutral"),
-            FinancialMetricSchema(metric="Free Cash Flow (FCF)", fy23="$2,480M", fy24="$2,890M", yoy_change="+16.5%", status="Positive"),
-            FinancialMetricSchema(metric="Debt to Equity Ratio", fy23="0.08x", fy24="0.07x", yoy_change="-0.01x", status="Positive")
-        ],
-        red_flags=[
-            RedFlagSchema(
-                severity="Medium",
-                title="Discretionary Demand Softness",
-                description="North American BFS client budget scrutiny slowing project conversions.",
-                citation="FY24 Annual Report p. 44"
-            ),
-            RedFlagSchema(
-                severity="Info",
-                title="Auditor Verification Clean",
-                description="No going-concern qualifications by independent statutory auditor.",
-                citation="FY24 Annual Report p. 182"
-            )
-        ],
-        comparison=[
-            ComparisonItemSchema(company="Infosys Limited", revenue="$18.56B", ebit_margin="20.7%", roe="31.4%", fcf_conversion="82%"),
-            ComparisonItemSchema(company="TCS Limited", revenue="$29.08B", ebit_margin="24.6%", roe="51.5%", fcf_conversion="89%"),
-            ComparisonItemSchema(company="Wipro Limited", revenue="$10.81B", ebit_margin="16.1%", roe="15.2%", fcf_conversion="78%")
-        ],
-        outlook="Positive medium-term outlook driven by large deal TCV ($17.7B) and Topaz GenAI enterprise adoption."
-    )
     
     doc = {
         "_id": rep_id,
@@ -86,13 +98,21 @@ async def create_report(report_in: ReportCreate, token_data: dict = Depends(get_
         "workspace_id": report_in.workspace_id,
         "user_id": user_id,
         "company_name": report_in.company_name or "Infosys Limited",
-        "summary": "Full multi-agent analyst report generated from indexed financial documents.",
-        "status": "COMPLETED",
+        "summary": "Report generation is in progress...",
+        "status": "PROCESSING",
         "created_at": now_str,
-        "sections": sections.model_dump()
+        "sections": None
     }
     
     await reports_col.insert_one(doc)
+    
+    background_tasks.add_task(
+        run_report_generation_task,
+        report_id=rep_id,
+        workspace_id=report_in.workspace_id,
+        company_name=report_in.company_name or "Infosys Limited",
+        document_text=document_text
+    )
     
     return ReportResponse(
         id=rep_id,
@@ -103,7 +123,7 @@ async def create_report(report_in: ReportCreate, token_data: dict = Depends(get_
         summary=doc["summary"],
         status=doc["status"],
         created_at=doc["created_at"],
-        sections=sections
+        sections=None
     )
 
 @router.get("/{report_id}", response_model=ReportResponse)
